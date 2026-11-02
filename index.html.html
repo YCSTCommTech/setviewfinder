@@ -1,0 +1,994 @@
+<title>Set Viewfinder</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;600;700&family=Chivo+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one-screen handheld monitor. Header with the set's name and Load button, the 3D stage with a dimmed 16:9 frame,
+   then a scrolling control cart (lens, moves, subjects, readouts, set lighting, captured frames). In short landscape the cart
+   becomes a right-hand column. Single dark look on purpose: monitors are judged against a dark surround. */
+:root{
+  --bg:#0d0e10; --panel:#16171a; --raise:#1f2024; --line:#2b2d32;
+  --fg:#ece8df; --muted:#9b978e; --dim:#6d6a64;
+  --accent:#f2b134; --rec:#e5483b;
+  --z-int:#e05c50; --z-per:#e6b84a; --z-soc:#4fb3a5; --z-pub:#7a8fc2;
+  --f-ui:'Archivo Narrow','Arial Narrow',system-ui,sans-serif;
+  --f-mono:'Chivo Mono',ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-ui);font-size:14px;overflow:hidden;-webkit-user-select:none;user-select:none}
+*{box-sizing:border-box}
+button,input{font:inherit;color:inherit}
+button,label.btn{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.app{height:100%;display:grid;grid-template-rows:auto minmax(0,1.25fr) minmax(0,1fr);gap:8px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:8px}
+.top{display:flex;align-items:center;gap:6px 10px;min-width:0;flex-wrap:wrap}
+.top .btn{padding:7px 10px;font-size:12.5px}
+@media (max-width:520px){.top h1{font-size:16px}.top .set{order:5;flex-basis:100%}}
+.top h1{margin:0;font-weight:700;font-size:19px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.top .set{flex:1;min-width:0;color:var(--muted);font-size:13px;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .set b{color:var(--fg);font-weight:600}
+
+.stage{position:relative;border-radius:8px;overflow:hidden;background:#000;border:1px solid var(--line);touch-action:none}
+.stage.picking{cursor:crosshair}
+#gl{position:absolute;inset:0;width:100%;height:100%;display:block}
+.frame{position:absolute;pointer-events:none;box-shadow:0 0 0 2000px rgba(0,0,0,.55);outline:1px solid rgba(255,255,255,.35)}
+.frame .third{position:absolute;background:rgba(255,255,255,.18)}
+.slate{position:absolute;left:8px;top:6px;font-family:var(--f-mono);font-size:11px;color:#fff;text-shadow:0 1px 2px #000;white-space:nowrap}
+.slate i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--rec);margin-right:5px}
+.note{position:absolute;left:50%;top:10px;transform:translateX(-50%);width:max-content;max-width:calc(100% - 24px);background:rgba(18,19,22,.95);border:1px solid var(--line);border-radius:6px;padding:7px 10px;font-size:12.5px;line-height:1.35;text-align:center}
+.stick{position:absolute;left:12px;bottom:12px;width:100px;height:100px;border-radius:50%;border:1px solid rgba(255,255,255,.28);background:rgba(10,10,12,.35);touch-action:none}
+.stick b{position:absolute;left:50%;top:50%;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;background:rgba(242,177,52,.85);box-shadow:0 1px 6px rgba(0,0,0,.5)}
+.stick span{position:absolute;inset:auto 0 -17px;text-align:center;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.6)}
+.flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .35s}
+.flash.on{opacity:.5;transition:none}
+.drop{position:absolute;inset:0;display:grid;place-items:center;background:rgba(242,177,52,.12);border:2px dashed var(--accent);border-radius:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;pointer-events:none}
+
+.cart{display:flex;flex-direction:column;gap:8px;min-width:0;min-height:0;overflow-y:auto;padding-bottom:4px}
+.row{display:flex;gap:6px;align-items:center;min-width:0;flex-wrap:wrap}
+.chips{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;flex:1}
+.chip{background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:6px 0;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.chip[aria-pressed="true"]{border-color:var(--accent);color:var(--fg);background:#2a2216}
+.btn{flex:1;display:inline-flex;align-items:center;justify-content:center;background:var(--raise);border:1px solid var(--line);border-radius:6px;padding:9px 8px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:13px;white-space:nowrap}
+.btn.load{flex:none;border-color:var(--accent);color:var(--accent)}
+.btn.rec{border-color:var(--rec);color:#fff;background:#3a1714}
+.btn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+.slider{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);flex:1 1 180px;min-width:0}
+.slider span{min-width:72px}
+.slider input{flex:1;accent-color:var(--accent);min-width:0}
+.slider output{font-family:var(--f-mono);color:var(--fg);min-width:50px;text-align:right;font-variant-numeric:tabular-nums}
+.reads{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+.ro{background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:4px 7px;min-width:0}
+.ro .k{display:block;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.ro .v{display:block;font-family:var(--f-mono);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.ro.zone{border-left:3px solid var(--zc,var(--line))}
+.sec{border-top:1px solid var(--line);padding-top:8px;display:flex;flex-direction:column;gap:6px}
+.sec h2{margin:0;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.subs{display:flex;flex-wrap:wrap;gap:4px}
+.sub{display:inline-flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:3px 4px 3px 10px;font-size:12.5px}
+.sub.on{border-color:var(--accent)}
+.sub button{background:none;border:0;color:var(--muted);width:22px;height:22px;border-radius:50%;line-height:1}
+.sub button:hover{color:var(--fg);background:var(--raise)}
+.hint{font-size:12px;color:var(--dim);margin:0;line-height:1.4}
+.reads.cam{grid-template-columns:repeat(4,minmax(0,1fr))}
+.tabs{display:flex;border-bottom:1px solid var(--line);flex:none}
+.tabs button{flex:1;background:none;border:0;border-bottom:2px solid transparent;padding:8px 4px 7px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:12.5px;color:var(--dim)}
+.tabs button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent)}
+.pane{display:flex;flex-direction:column;gap:8px}
+.sizes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+.size{background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:5px 2px 6px;text-align:center;min-width:0}
+.size b{display:block;font-weight:700;font-size:15px;letter-spacing:.06em;line-height:1.1}
+.size small{display:block;font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.size[aria-pressed="true"]{border-color:var(--accent);background:#2a2216}
+.size[aria-pressed="true"] b{color:var(--accent)}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px}
+.lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+#plan{display:block;width:100%;aspect-ratio:4/3;max-height:360px;background:#0a0b0c;border:1px solid var(--line);border-radius:6px;touch-action:none;cursor:crosshair}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:11.5px;color:var(--muted)}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+.strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;min-height:58px}
+.strip:empty::before{content:"Captured frames last only until you close this page. Use Save project to keep them.";color:var(--dim);font-size:12px;padding:6px 0}
+.thumb{position:relative;flex:none;width:136px;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:var(--panel);display:flex;flex-direction:column}
+.thumb .go{display:block;padding:0;border:0;background:none;text-align:left}
+.thumb img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+.thumb small{display:block;padding:3px 5px 0;font-family:var(--f-mono);font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.thumb input{margin:3px 4px 4px;background:var(--bg);border:1px solid var(--line);border-radius:3px;padding:3px 5px;font-size:11.5px;min-width:0;-webkit-user-select:text;user-select:text}
+.thumb .x{position:absolute;right:3px;top:3px;width:22px;height:22px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;line-height:1;font-size:14px}
+.btn.save{flex:none;border-color:var(--line)}
+.btn.save.dirty{border-color:var(--accent);color:var(--accent)}
+.btn.save .n{font-family:var(--f-mono);font-size:11px;margin-left:6px;letter-spacing:0}
+details{font-size:12.5px;color:var(--muted)}
+details summary{cursor:pointer;color:var(--fg);font-weight:600;letter-spacing:.04em}
+details ol{margin:6px 0 0;padding-left:18px;line-height:1.5}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+@media (orientation:landscape) and (max-height:600px), (min-width:1000px){
+  .app{grid-template-columns:minmax(0,1fr) 340px;grid-template-rows:auto minmax(0,1fr)}
+  .top{grid-column:1/-1}
+  .reads{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (prefers-reduced-motion:reduce){.flash{transition:none}}
+</style>
+
+<div class="app">
+  <header class="top">
+    <h1>Set Viewfinder</h1>
+    <span class="set" id="setName">Set: <b>Sample diner</b></span>
+    <label class="btn load" for="file" title="Open a Blender set (.glb) or a saved project (.json)">Open</label>
+    <input class="sr" type="file" id="file" accept=".glb,.json,model/gltf-binary,application/json">
+    <button class="btn save" id="save" title="Download this project so you can open it again later">Save project</button>
+    <button class="btn save" id="board" title="Download a storyboard page to hand in">Storyboard</button>
+  </header>
+
+  <section class="stage" id="stage" aria-label="Camera view of the set">
+    <canvas id="gl"></canvas>
+    <div class="frame" id="frame">
+      <div class="third" style="left:33.33%;top:0;bottom:0;width:1px"></div>
+      <div class="third" style="left:66.66%;top:0;bottom:0;width:1px"></div>
+      <div class="third" style="top:33.33%;left:0;right:0;height:1px"></div>
+      <div class="third" style="top:66.66%;left:0;right:0;height:1px"></div>
+      <div class="slate" id="slate"></div>
+    </div>
+    <div class="note" id="note" hidden></div>
+    <div class="stick" id="stick" aria-label="Walk joystick"><b id="knob"></b><span>Walk</span></div>
+    <div class="flash" id="flash"></div>
+    <div class="drop" id="drop" hidden>Drop a .glb set or saved project</div>
+  </section>
+
+  <aside class="cart">
+    <div class="row"><div class="chips" id="lenses" role="group" aria-label="Lens"></div></div>
+    <div class="row">
+      <button class="btn" id="motion" aria-pressed="false">Phone motion</button>
+      <button class="btn" id="center">Face subject</button>
+      <button class="btn" id="bcam" hidden>Blender cam</button>
+      <button class="btn rec" id="capture">Capture</button>
+    </div>
+    <div class="reads cam">
+      <div class="ro"><span class="k">Lens</span><span class="v" id="cLens">—</span></div>
+      <div class="ro"><span class="k">Field of view</span><span class="v" id="cFov">—</span></div>
+      <div class="ro"><span class="k">Lens height</span><span class="v" id="cHeight">—</span></div>
+      <div class="ro"><span class="k">Tilt</span><span class="v" id="cTilt">—</span></div>
+      <div class="ro"><span class="k">Pan</span><span class="v" id="cPan">—</span></div>
+      <div class="ro"><span class="k">Focus</span><span class="v" id="cFocus">—</span></div>
+      <div class="ro"><span class="k">Aperture</span><span class="v" id="cStop">—</span></div>
+      <div class="ro"><span class="k">In focus</span><span class="v" id="cDof">—</span></div>
+      <div class="ro"><span class="k">Shot</span><span class="v" id="rShot">—</span></div>
+      <div class="ro"><span class="k">Angle</span><span class="v" id="rAngle">—</span></div>
+      <div class="ro"><span class="k">Side</span><span class="v" id="rSide">—</span></div>
+      <div class="ro zone" id="rZoneBox"><span class="k">Distance</span><span class="v" id="rZone">—</span></div>
+    </div>
+
+    <div class="strip" id="strip"></div>
+
+    <div class="tabs" role="tablist">
+      <button role="tab" id="t-frame" aria-controls="p-frame" aria-selected="true">Frame</button>
+      <button role="tab" id="t-plan" aria-controls="p-plan" aria-selected="false">Plan</button>
+      <button role="tab" id="t-subj" aria-controls="p-subj" aria-selected="false">Subjects</button>
+      <button role="tab" id="t-set" aria-controls="p-set" aria-selected="false">Set</button>
+    </div>
+
+    <div class="pane" id="p-frame" role="tabpanel">
+      <span class="lbl">Shot size: moves the camera to frame the subject</span>
+      <div class="sizes" id="sizes"></div>
+      <span class="lbl">Camera height</span>
+      <div class="seg" id="heights"></div>
+      <span class="lbl">Aperture: lower f-number, less in focus</span>
+      <div class="chips" id="stops" style="grid-template-columns:repeat(4,minmax(0,1fr))"></div>
+      <label class="slider" for="h"><span>Lens height</span><input id="h" type="range" min="0.1" max="3" step="0.01" value="1.6"><output id="hv">1.60 m</output></label>
+    </div>
+
+    <div class="pane" id="p-plan" role="tabpanel" hidden>
+      <canvas id="plan" aria-label="Top-down floor plan of the set"></canvas>
+      <div class="legend">
+        <span><i style="background:var(--accent)"></i>Camera and field of view</span>
+        <span><i style="background:#cfd6df"></i>Subjects (tick shows facing)</span>
+        <span><i style="background:#3a3d44"></i>Set pieces</span>
+      </div>
+      <p class="hint">Tap or drag on the plan to move the camera. The back of the set is at the top; grid squares are 1 m.</p>
+    </div>
+
+    <div class="pane" id="p-subj" role="tabpanel" hidden>
+      <div class="subs" id="subs"></div>
+      <div class="row">
+        <button class="btn" id="pick" aria-pressed="false">Tap to add subject</button>
+        <button class="btn" id="zones" aria-pressed="false">Proxemic zones</button>
+      </div>
+      <p class="hint">Readouts describe the subject nearest the centre of frame. Objects named Actor, Stand-in, Character or Talent in Blender are added automatically.</p>
+    </div>
+
+    <div class="pane" id="p-set" role="tabpanel" hidden>
+      <label class="slider" for="work"><span>Work light</span><input id="work" type="range" min="0" max="2" step="0.01" value="1"><output id="workv">100%</output></label>
+      <label class="slider" for="lights"><span>Set lights</span><input id="lights" type="range" min="0" max="3" step="0.01" value="1"><output id="lightsv">100%</output></label>
+      <label class="slider" for="expo"><span>Exposure</span><input id="expo" type="range" min="-3" max="3" step="0.1" value="0"><output id="expov">0.0 EV</output></label>
+      <details>
+        <summary>Exporting a set from Blender</summary>
+        <ol>
+          <li>File › Export › glTF 2.0, Format: <b>glTF Binary (.glb)</b>.</li>
+          <li>Under Include, tick <b>Cameras</b> and <b>Punctual Lights</b>.</li>
+          <li>Area lights don't export. Use Point, Spot or Sun lights for practicals and windows.</li>
+          <li>Leave <b>Compression</b> (Draco) off. This page can't decode it.</li>
+          <li>Name actor objects "Actor…" or "Stand-in…" so they become subjects.</li>
+          <li>Procedural shaders don't export: use image textures or plain colors.</li>
+          <li>Keep it under about 500k triangles so phones stay smooth.</li>
+        </ol>
+      </details>
+    </div>
+  </aside>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const stage = $('stage'), canvas = $('gl');
+let noteTimer = 0;
+function note(msg, ms = 0) {
+  $('note').textContent = msg || ''; $('note').hidden = !msg;
+  clearTimeout(noteTimer); if (msg && ms) noteTimer = setTimeout(() => note(''), ms);
+}
+if (!window.THREE) { note("The 3D library didn't load. Check your connection and reopen the page."); return; }
+
+// ---------- renderer / scene ----------
+let renderer;
+try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true }); }
+catch (e) { note("This device can't run WebGL, which the 3D view needs."); return; }
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.physicallyCorrectLights = true;   // matches Blender's glTF "Standard" light units
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0b0c0e);
+const cam = new THREE.PerspectiveCamera(40, 1, 0.02, 500);
+cam.rotation.order = 'YXZ';
+const setRoot = new THREE.Group(); scene.add(setRoot);
+
+// Work lights (always on, adjustable)
+const hemi = new THREE.HemisphereLight(0xbcd2e8, 0x2a2420, 1.7);
+const key = new THREE.DirectionalLight(0xfff1de, 3.2);
+key.castShadow = true; key.shadow.mapSize.set(1024, 1024); key.shadow.bias = -0.0005;
+scene.add(hemi, key, key.target);
+let workLevel = 1, setLevel = 1;
+function applyWork() { hemi.intensity = 1.7 * workLevel; key.intensity = 3.2 * workLevel; }
+function aimWorkLight(box) {
+  const c = box.getCenter(new THREE.Vector3()), s = box.getSize(new THREE.Vector3()), r = Math.max(s.x, s.z, 4);
+  key.position.set(c.x + r * 0.6, box.max.y + r * 0.5, c.z + r * 0.4); key.target.position.copy(c);
+  Object.assign(key.shadow.camera, { left: -r, right: r, top: r, bottom: -r, near: 0.5, far: r * 4 });
+  key.shadow.camera.updateProjectionMatrix();
+}
+
+// ---------- set state ----------
+let setLights = [];      // {light, base}
+let subjects = [];       // {name, obj}
+let blenderCam = null;
+let bounds = new THREE.Box3(new THREE.Vector3(-5, 0, -3.5), new THREE.Vector3(5, 3, 3.5));
+const SUBJECT_RE = /actor|stand.?in|character|talent|subject|person/i;
+
+function disposeTree(o) {
+  o.traverse(n => {
+    if (n.geometry) n.geometry.dispose();
+    if (n.material) (Array.isArray(n.material) ? n.material : [n.material]).forEach(m => {
+      for (const k in m) if (m[k] && m[k].isTexture) m[k].dispose();
+      m.dispose();
+    });
+  });
+}
+function clearSet() {
+  [...setRoot.children].forEach(c => { setRoot.remove(c); disposeTree(c); });
+  setLights = []; subjects = []; blenderCam = null; $('bcam').hidden = true;
+}
+
+// ---------- sample diner (shown until you load your own set) ----------
+function buildSample() {
+  const g = new THREE.Group(); g.name = 'Sample diner';
+  const mat = (color, extra = {}) => new THREE.MeshStandardMaterial(Object.assign({ color, roughness: 0.7 }, extra));
+  const box = (w, h, d, m, x, y, z, sh = true) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); o.position.set(x, y, z); o.castShadow = sh; o.receiveShadow = true; g.add(o); return o; };
+  const cyl = (rt, rb, h, m, x, y, z, seg = 20) => { const o = new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg), m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; g.add(o); return o; };
+  const tc = document.createElement('canvas'); tc.width = tc.height = 64;
+  const tx = tc.getContext('2d'); tx.fillStyle = '#e9e4d8'; tx.fillRect(0, 0, 64, 64); tx.fillStyle = '#1a1a1c'; tx.fillRect(0, 0, 32, 32); tx.fillRect(32, 32, 32, 32);
+  const ft = new THREE.CanvasTexture(tc); ft.wrapS = ft.wrapT = THREE.RepeatWrapping; ft.repeat.set(16, 11); ft.encoding = THREE.sRGBEncoding; ft.magFilter = THREE.NearestFilter;
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(10, 7), new THREE.MeshStandardMaterial({ map: ft, roughness: 0.45 }));
+  floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; g.add(floor);
+  const wallM = mat(0x3c6e66), trimM = mat(0xb63a32), chromeM = mat(0xc9ccd1, { metalness: 0.9, roughness: 0.25 }), topM = mat(0xe8e3d6, { roughness: 0.3 });
+  box(10, 3.2, 0.1, wallM, 0, 1.6, -3.5, false); box(0.1, 3.2, 7, wallM, -5, 1.6, 0, false);
+  box(10, 0.12, 0.12, trimM, 0, 1.0, -3.43, false);
+  for (let i = 0; i < 5; i++) box(0.1, 3.2, 0.12, mat(0x2b2f33), 5, 1.6, -3.4 + i * 1.7, false);
+  for (let i = 0; i < 4; i++) { const p = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 1.6), new THREE.MeshBasicMaterial({ color: 0x9fc4e6 })); p.position.set(4.96, 1.75, -2.55 + i * 1.7); p.rotation.y = -Math.PI / 2; g.add(p); }
+  box(6.4, 1.0, 0.7, trimM, 0.2, 0.5, -2.5); box(6.6, 0.06, 0.85, topM, 0.2, 1.03, -2.5);
+  for (let i = 0; i < 6; i++) { const x = -2.5 + i; cyl(0.03, 0.03, 0.7, chromeM, x, 0.35, -1.75, 10); cyl(0.2, 0.2, 0.08, trimM, x, 0.74, -1.75); }
+  box(5.5, 0.05, 0.3, chromeM, 0.2, 1.75, -3.35, false); box(5.5, 0.05, 0.3, chromeM, 0.2, 2.15, -3.35, false);
+  const boothM = mat(0x9e2b27, { roughness: 0.5 });
+  [-1.2, 1.3].forEach(z => {
+    box(0.8, 0.05, 1.0, topM, -4.15, 0.76, z); cyl(0.05, 0.05, 0.74, chromeM, -4.15, 0.37, z, 10);
+    box(0.75, 0.45, 0.5, boothM, -4.4, 0.23, z - 0.9); box(0.75, 0.6, 0.12, boothM, -4.4, 0.75, z - 1.1);
+    box(0.75, 0.45, 0.5, boothM, -4.4, 0.23, z + 0.9); box(0.75, 0.6, 0.12, boothM, -4.4, 0.75, z + 1.1);
+  });
+  [-1.8, 0.2, 2.2].forEach(x => {
+    cyl(0.005, 0.005, 0.9, mat(0x111111), x, 2.75, -2.2, 6);
+    cyl(0.04, 0.22, 0.18, mat(0x1f4a44), x, 2.25, -2.2).castShadow = false;
+    const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.06, 12, 8), new THREE.MeshBasicMaterial({ color: 0xffd9a0 })); bulb.position.set(x, 2.15, -2.2); g.add(bulb);
+    const pl = new THREE.PointLight(0xffc27a, 18, 0, 2); pl.position.set(x, 2.05, -2.2); g.add(pl);
+  });
+  const actor = (name, color, x, z, deg) => {
+    const a = new THREE.Group(); a.name = name; const m = mat(color, { roughness: 0.55 });
+    const parts = [new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.13, 1.42, 24), m), new THREE.Mesh(new THREE.SphereGeometry(0.115, 24, 16), m), new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, 0.05), m)];
+    parts[0].position.y = 0.71; parts[1].position.y = 1.625; parts[2].position.set(0, 1.62, 0.12);
+    parts.forEach(p => { p.castShadow = p.receiveShadow = true; a.add(p); });
+    a.position.set(x, 0, z); a.rotation.y = THREE.MathUtils.degToRad(deg); g.add(a);
+  };
+  actor('Actor Server', 0xd9d4c7, 0.6, -2.0, 205);
+  actor('Actor Customer', 0x8fa6b8, -0.4, -0.3, 30);
+  return g;
+}
+
+function useSet(root, label, cameras) {
+  clearSet();
+  setRoot.add(root);
+  root.updateMatrixWorld(true);
+  let tris = 0;
+  root.traverse(o => {
+    if (o.isMesh) {
+      o.castShadow = o.receiveShadow = true;
+      const gm = o.geometry; tris += gm.index ? gm.index.count / 3 : (gm.attributes.position ? gm.attributes.position.count / 3 : 0);
+    }
+    if (o.isLight && !o.isAmbientLight && !o.isHemisphereLight) {
+      // Blender's glTF "Standard" units come in as candela/lux (watts x 683). Bring them back to a
+      // watt-like scale so a 60 W lamp reads like a lamp here; files exported "Unitless" are left alone.
+      let base = o.intensity;
+      if (o.isDirectionalLight && base > 50) base /= 683;
+      else if (!o.isDirectionalLight && base > 200) base *= 4 * Math.PI / 683;
+      setLights.push({ light: o, base });
+      if (o.isSpotLight || o.isDirectionalLight) o.castShadow = true;
+    }
+  });
+  // auto-subjects: outermost nodes whose names look like actors
+  root.traverse(o => {
+    if (o === root || !SUBJECT_RE.test(o.name)) return;
+    let p = o.parent, inside = false;
+    while (p && p !== root) { if (SUBJECT_RE.test(p.name)) inside = true; p = p.parent; }
+    if (!inside) subjects.push({ name: cleanName(o.name), obj: o });
+  });
+  bounds = new THREE.Box3().setFromObject(root);
+  if (bounds.isEmpty()) bounds.set(new THREE.Vector3(-5, 0, -5), new THREE.Vector3(5, 3, 5));
+  aimWorkLight(bounds);
+  $('setName').innerHTML = '';
+  $('setName').append('Set: ');
+  const b = document.createElement('b'); b.textContent = label; $('setName').append(b);
+  if (tris > 0) $('setName').append(` · ${Math.round(tris / 1000)}k tris`);
+  blenderCam = cameras && cameras.length ? cameras[0] : null;
+  $('bcam').hidden = !blenderCam;
+  renderSubs(); buildFootprints(); if (!$('p-plan').hidden) sizePlan();
+  if (blenderCam) jumpToBlenderCam();
+  else startPosition();
+  applySetLights();
+  if (tris > 600000) note(`Heavy set (${Math.round(tris / 1000)}k triangles). It may stutter on phones.`, 6000);
+}
+function cleanName(n) { return (n || 'Subject').replace(/[_.]+/g, ' ').replace(/\s+\d+$/, '').trim(); }
+function applySetLights() { setLights.forEach(l => l.light.intensity = l.base * setLevel); }
+
+function startPosition() {
+  const c = bounds.getCenter(new THREE.Vector3()), s = bounds.getSize(new THREE.Vector3());
+  rig.y = THREE.MathUtils.clamp(bounds.min.y + 1.6, bounds.min.y + 0.2, bounds.min.y + 3);
+  const target = subjects[0] ? subjectInfo(subjects[0]).center : c;
+  rig.x = target.x + Math.min(s.x * 0.35, 3); rig.z = target.z + Math.min(s.z * 0.45, 4);
+  syncHeight(); faceSubject();
+}
+function jumpToBlenderCam() {
+  const p = new THREE.Vector3(), q = new THREE.Quaternion();
+  blenderCam.updateMatrixWorld(true); blenderCam.getWorldPosition(p); blenderCam.getWorldQuaternion(q);
+  rig.x = p.x; rig.y = p.y; rig.z = p.z; syncHeight();
+  if (blenderCam.isPerspectiveCamera) {
+    rig.lens = Math.round(SENSOR_H / 2 / Math.tan(THREE.MathUtils.degToRad(blenderCam.fov) / 2));
+    syncLens();
+  }
+  const v = new THREE.Vector3(0, 0, -1).applyQuaternion(q);
+  setLook(Math.atan2(-v.x, -v.z), Math.asin(THREE.MathUtils.clamp(v.y, -1, 1)));
+}
+
+// ---------- loading .glb ----------
+function loadFile(file) {
+  if (!file) return;
+  if (/\.json$/i.test(file.name)) { openProject(file); return; }
+  if (!/\.glb$/i.test(file.name)) { note('Open a .glb set from Blender, or a project .json you saved here.', 6000); return; }
+  if (!THREE.GLTFLoader) { note("The model loader didn't load. Check your connection and reopen the page."); return; }
+  note(`Loading ${file.name}…`);
+  file.arrayBuffer().then(buf => {
+    if (dirty && !confirmNew()) return;
+    const keep = buf.slice(0);
+    new THREE.GLTFLoader().parse(buf, '', gltf => {
+      clearShots();
+      setGlb = keep; setLabel = file.name.replace(/\.glb$/i, '');
+      useSet(gltf.scene, setLabel, gltf.cameras);
+      const msg = subjects.length ? `Loaded with ${subjects.length} subject${subjects.length > 1 ? 's' : ''}.` : 'Loaded. Tap "Tap to add subject", then tap your actor.';
+      note(msg, 4000);
+    }, err => {
+      const s = String(err && (err.message || err));
+      note(/draco/i.test(s) ? 'This file uses Draco compression. Re-export from Blender with Compression turned off.'
+        : /meshopt/i.test(s) ? 'This file uses meshopt compression. Re-export without compression.'
+        : `Couldn't read that file: ${s.slice(0, 140)}`);
+    });
+  }).catch(() => note("Couldn't open that file."));
+}
+$('file').addEventListener('change', e => { loadFile(e.target.files[0]); e.target.value = ''; });
+let dragDepth = 0;
+addEventListener('dragenter', e => { e.preventDefault(); dragDepth++; $('drop').hidden = false; });
+addEventListener('dragleave', () => { if (--dragDepth <= 0) { dragDepth = 0; $('drop').hidden = true; } });
+addEventListener('dragover', e => e.preventDefault());
+addEventListener('drop', e => { e.preventDefault(); dragDepth = 0; $('drop').hidden = true; loadFile(e.dataTransfer.files[0]); });
+
+// ---------- camera rig ----------
+const LENSES = [18, 24, 35, 50, 85, 135];
+const SENSOR_H = 36 * 9 / 16;
+const SHOTS = [['ECU', .08], ['CU', .19], ['MCU', .32], ['MS', .50], ['MWS', .68], ['FS', 1.2], ['WS', 2.2], ['EWS', 5.0]];
+const ZONES = [[0.45, 'Intimate', '--z-int', 0xe05c50], [1.2, 'Personal', '--z-per', 0xe6b84a], [3.6, 'Social', '--z-soc', 0x4fb3a5], [7.6, 'Public', '--z-pub', 0x7a8fc2]];
+const rig = { x: 1.9, z: 2.2, y: 1.6, yaw: 0.35, pitch: -0.05, lens: 35 };
+let gyro = false, gotGyro = false, yawOffset = 0;
+const devQ = new THREE.Quaternion();
+
+const lensBox = $('lenses');
+LENSES.forEach(mm => {
+  const b = document.createElement('button'); b.className = 'chip'; b.textContent = mm;
+  b.setAttribute('aria-label', mm + ' millimetre lens');
+  b.onclick = () => { rig.lens = mm; syncLens(); };
+  lensBox.appendChild(b);
+});
+function syncLens() { [...lensBox.children].forEach((b, i) => b.setAttribute('aria-pressed', LENSES[i] === rig.lens)); layout(); }
+const hIn = $('h');
+function syncHeight() {
+  hIn.min = (bounds.min.y + 0.1).toFixed(2); hIn.max = (Math.max(bounds.max.y, bounds.min.y + 3)).toFixed(2);
+  hIn.value = rig.y;
+}
+hIn.oninput = () => { rig.y = +hIn.value; };
+
+let W = 1, H = 1, fw = 1, fh = 1;
+function layout() {
+  const r = stage.getBoundingClientRect();
+  W = Math.max(1, r.width); H = Math.max(1, r.height);
+  renderer.setSize(W, H, false);
+  fw = Math.min(W * 0.92, H * 0.92 * 16 / 9); fh = fw * 9 / 16;
+  const fr = $('frame').style;
+  fr.width = fw + 'px'; fr.height = fh + 'px'; fr.left = (W - fw) / 2 + 'px'; fr.top = (H - fh) / 2 + 'px';
+  const vFrame = 2 * Math.atan(SENSOR_H / 2 / rig.lens);
+  cam.fov = THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(vFrame / 2) * H / fh));
+  cam.aspect = W / H; cam.updateProjectionMatrix();
+}
+new ResizeObserver(layout).observe(stage);
+
+function currentDir() { return new THREE.Vector3(0, 0, -1).applyQuaternion(cam.quaternion); }
+function currentYaw() { const v = currentDir(); return Math.atan2(-v.x, -v.z); }
+function devYaw() { const v = new THREE.Vector3(0, 0, -1).applyQuaternion(devQ); return Math.atan2(-v.x, -v.z); }
+function setLook(yaw, pitch) {
+  if (gyro) yawOffset += yaw - devYaw() - yawOffset;
+  else { rig.yaw = yaw; rig.pitch = THREE.MathUtils.clamp(pitch, -1.45, 1.45); }
+}
+
+// ---------- subjects ----------
+function subjectInfo(s) {
+  const b = new THREE.Box3().setFromObject(s.obj);
+  const h = Math.max(0.05, b.max.y - b.min.y);
+  const cx = (b.min.x + b.max.x) / 2, cz = (b.min.z + b.max.z) / 2;
+  const q = new THREE.Quaternion(); s.obj.getWorldQuaternion(q);
+  const f = new THREE.Vector3(0, 0, 1).applyQuaternion(q); f.y = 0;
+  if (f.lengthSq() < 1e-6) f.set(0, 0, 1); f.normalize();
+  return { h, floor: b.min.y, center: new THREE.Vector3(cx, b.min.y, cz), eye: new THREE.Vector3(cx, b.max.y - 0.065 * h, cz), fwd: f };
+}
+function renderSubs() {
+  const box = $('subs'); box.textContent = '';
+  if (!subjects.length) { const p = document.createElement('span'); p.className = 'hint'; p.textContent = 'No subjects yet.'; box.append(p); return; }
+  subjects.forEach((s, i) => {
+    const el = document.createElement('span'); el.className = 'sub' + (current === s ? ' on' : '');
+    el.append(s.name);
+    const x = document.createElement('button'); x.textContent = '×'; x.setAttribute('aria-label', 'Remove ' + s.name);
+    x.onclick = () => { subjects.splice(i, 1); renderSubs(); };
+    el.append(x); box.append(el);
+  });
+}
+function nearestSubject() {
+  let best = null, bd = Infinity;
+  subjects.forEach(s => { const c = subjectInfo(s).center, d = (c.x - rig.x) ** 2 + (c.z - rig.z) ** 2; if (d < bd) { bd = d; best = s; } });
+  return best;
+}
+function faceSubject() {
+  const s = current || nearestSubject();
+  const t = s ? subjectInfo(s).eye : bounds.getCenter(new THREE.Vector3());
+  const dx = t.x - rig.x, dy = t.y - rig.y, dz = t.z - rig.z;
+  setLook(Math.atan2(-dx, -dz), Math.atan2(dy, Math.hypot(dx, dz)));
+}
+$('center').onclick = faceSubject;
+$('bcam').onclick = () => blenderCam && jumpToBlenderCam();
+
+let picking = false;
+$('pick').onclick = () => {
+  picking = !picking; $('pick').setAttribute('aria-pressed', picking); stage.classList.toggle('picking', picking);
+  note(picking ? 'Tap your actor in the picture.' : '', picking ? 0 : 1);
+};
+const ray = new THREE.Raycaster();
+function pickAt(cx, cy) {
+  const r = stage.getBoundingClientRect();
+  ray.setFromCamera({ x: (cx - r.left) / r.width * 2 - 1, y: -((cy - r.top) / r.height) * 2 + 1 }, cam);
+  const hit = ray.intersectObject(setRoot, true).find(h => h.object.isMesh && h.object.visible);
+  picking = false; $('pick').setAttribute('aria-pressed', 'false'); stage.classList.remove('picking');
+  if (!hit) { note('Nothing there. Try again on the actor.', 2500); return; }
+  let o = hit.object;
+  const top = setRoot.children[0];
+  while (o.parent && o.parent !== top && o.parent !== setRoot) o = o.parent;
+  if (subjects.some(s => s.obj === o)) { note(`${cleanName(o.name)} is already a subject.`, 2500); return; }
+  const h = new THREE.Box3().setFromObject(o).getSize(new THREE.Vector3()).y;
+  if (h > 3.5) { note('That looks like part of the set, not an actor. Group your actor into one object in Blender.', 4500); return; }
+  subjects.push({ name: cleanName(o.name) || `Subject ${subjects.length + 1}`, obj: o });
+  renderSubs(); buildFootprints(); note(`Added ${cleanName(o.name)}.`, 2000);
+}
+
+// proxemic zone rings
+const zoneGroup = new THREE.Group(); zoneGroup.visible = false; scene.add(zoneGroup);
+ZONES.forEach(z => {
+  const pts = []; for (let i = 0; i <= 72; i++) { const a = i / 72 * Math.PI * 2; pts.push(new THREE.Vector3(Math.cos(a) * z[0], 0, Math.sin(a) * z[0])); }
+  zoneGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: z[3], transparent: true, opacity: 0.9, depthTest: false })));
+});
+zoneGroup.renderOrder = 10;
+$('zones').onclick = () => { zoneGroup.visible = !zoneGroup.visible; $('zones').setAttribute('aria-pressed', zoneGroup.visible); };
+
+// ---------- phone motion ----------
+const zee = new THREE.Vector3(0, 0, 1), q1 = new THREE.Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
+const eul = new THREE.Euler(), q0 = new THREE.Quaternion();
+function screenAngle() { const a = (screen.orientation && screen.orientation.angle) ?? window.orientation ?? 0; return THREE.MathUtils.degToRad(a || 0); }
+function onOrient(e) {
+  if (e.alpha == null) return;
+  gotGyro = true;
+  const d = THREE.MathUtils.degToRad;
+  eul.set(d(e.beta), d(e.alpha), -d(e.gamma), 'YXZ');
+  devQ.setFromEuler(eul).multiply(q1).multiply(q0.setFromAxisAngle(zee, -screenAngle()));
+  if (!gyro) { const y = currentYaw(); gyro = true; yawOffset = y - devYaw(); $('motion').setAttribute('aria-pressed', 'true'); note(''); }
+}
+$('motion').onclick = async () => {
+  if (gyro) { const y = currentYaw(); gyro = false; rig.yaw = y; rig.pitch = 0; $('motion').setAttribute('aria-pressed', 'false'); return; }
+  try {
+    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+      if (await DeviceOrientationEvent.requestPermission() !== 'granted') throw new Error('denied');
+    }
+    window.addEventListener('deviceorientation', onOrient);
+    if (navigator.wakeLock) navigator.wakeLock.request('screen').catch(() => {});
+    gotGyro = false;
+    setTimeout(() => { if (!gotGyro) note('No motion data on this page, so drag to look instead. Open the standalone file over HTTPS for phone motion.', 7000); }, 1500);
+  } catch (e) { note('Motion access was refused, so drag on the picture to look around.', 5000); }
+};
+
+// ---------- drag to look / tap to pick ----------
+let drag = null;
+stage.addEventListener('pointerdown', e => {
+  if (e.target.closest('#stick')) return;
+  drag = { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, id: e.pointerId }; stage.setPointerCapture(e.pointerId);
+});
+stage.addEventListener('pointermove', e => {
+  if (!drag || e.pointerId !== drag.id) return;
+  const k = THREE.MathUtils.degToRad(cam.fov) / H;
+  const dx = (e.clientX - drag.x) * k, dy = (e.clientY - drag.y) * k;
+  drag.x = e.clientX; drag.y = e.clientY;
+  if (picking) return;
+  if (gyro) yawOffset += dx;
+  else { rig.yaw += dx; rig.pitch = THREE.MathUtils.clamp(rig.pitch + dy, -1.45, 1.45); }
+});
+stage.addEventListener('pointerup', e => {
+  if (!drag || e.pointerId !== drag.id) return;
+  const moved = Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy);
+  drag = null;
+  if (picking && moved < 8) pickAt(e.clientX, e.clientY);
+});
+stage.addEventListener('pointercancel', () => { drag = null; });
+
+// joystick + keys
+const stick = $('stick'), knob = $('knob');
+const joy = { x: 0, y: 0, id: null };
+function setKnob() { knob.style.transform = `translate(${joy.x * 30}px,${joy.y * 30}px)`; }
+function moveJoy(e) {
+  const r = stick.getBoundingClientRect();
+  let x = (e.clientX - r.left - r.width / 2) / 38, y = (e.clientY - r.top - r.height / 2) / 38;
+  const l = Math.hypot(x, y); if (l > 1) { x /= l; y /= l; }
+  joy.x = x; joy.y = y; setKnob();
+}
+stick.addEventListener('pointerdown', e => { joy.id = e.pointerId; stick.setPointerCapture(e.pointerId); moveJoy(e); e.stopPropagation(); });
+stick.addEventListener('pointermove', e => { if (e.pointerId === joy.id) moveJoy(e); });
+const endJoy = e => { if (e.pointerId === joy.id) { joy.id = null; joy.x = joy.y = 0; setKnob(); } };
+stick.addEventListener('pointerup', endJoy); stick.addEventListener('pointercancel', endJoy);
+const keys = {};
+addEventListener('keydown', e => { if (e.target.tagName !== 'INPUT') keys[e.key.toLowerCase()] = true; });
+addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+
+// set lighting sliders
+$('work').oninput = e => { workLevel = +e.target.value; $('workv').textContent = Math.round(workLevel * 100) + '%'; applyWork(); };
+$('lights').oninput = e => { setLevel = +e.target.value; $('lightsv').textContent = Math.round(setLevel * 100) + '%'; applySetLights(); };
+$('expo').oninput = e => { const ev = +e.target.value; renderer.toneMappingExposure = Math.pow(2, ev); $('expov').textContent = (ev > 0 ? '+' : '') + ev.toFixed(1) + ' EV'; };
+
+// ---------- readouts ----------
+let current = null, lastShot = '';
+const set = (el, t) => { if (el.textContent !== t) el.textContent = t; };
+const heightLabel = el => el >= 50 ? "Bird's eye" : el >= 10 ? 'High' : el > -10 ? 'Eye level' : el > -40 ? 'Low' : "Worm's eye";
+function sideLabel(a) { const s = a > 0 ? 'L' : 'R', m = Math.abs(a); return m < 22.5 ? 'Front' : m < 67.5 ? `¾ front ${s}` : m < 112.5 ? `Profile ${s}` : m < 157.5 ? `¾ back ${s}` : 'Back'; }
+function readouts() {
+  const fwd = currentDir();
+  let pick = null, bestOff = 0.6;
+  subjects.forEach(s => {
+    if (!s.obj.parent) return;
+    const info = subjectInfo(s), v = info.eye.clone().sub(cam.position), depth = v.dot(fwd);
+    if (depth <= 0.05) return;
+    const off = v.angleTo(fwd);
+    if (off < bestOff) { bestOff = off; pick = { s, info, depth }; }
+  });
+  const prev = current; current = pick ? pick.s : null;
+  if (prev !== current) renderSubs();
+  const sl = $('slate'); sl.innerHTML = '<i></i>'; sl.append(`A-CAM  ${rig.lens}mm  ${pick ? pick.s.name.toUpperCase() : 'NO SUBJECT'}`);
+  if (!pick) {
+    ['rShot', 'rAngle', 'rSide', 'rZone'].forEach(id => set($(id), '—')); $('rZoneBox').style.removeProperty('--zc');
+    lastShot = `${rig.lens}mm`; cameraReadouts(null); drawPlan(null); return;
+  }
+  const { info } = pick;
+  const ratio = (pick.depth * SENSOR_H / rig.lens) / info.h;
+  const shot = SHOTS.reduce((b, s) => Math.abs(Math.log(ratio / s[1])) < Math.abs(Math.log(ratio / b[1])) ? s : b);
+  const dx = cam.position.x - info.center.x, dz = cam.position.z - info.center.z, horiz = Math.hypot(dx, dz);
+  const el = THREE.MathUtils.radToDeg(Math.atan2(cam.position.y - info.eye.y, Math.max(horiz, 1e-4)));
+  const side = THREE.MathUtils.radToDeg(Math.atan2(info.fwd.z * dx - info.fwd.x * dz, info.fwd.x * dx + info.fwd.z * dz));
+  const zone = ZONES.find(z => horiz <= z[0]) || ZONES[3];
+  lastShot = `${shot[0]} · ${rig.lens}mm · ${heightLabel(el)} · ${pick.s.name}`;
+  set($('rShot'), shot[0]); set($('rAngle'), heightLabel(el)); set($('rSide'), sideLabel(side));
+  set($('rZone'), `${horiz.toFixed(1)} m ${zone[1]}`);
+  $('rZoneBox').style.setProperty('--zc', `var(${zone[2]})`);
+  zoneGroup.position.set(info.center.x, info.floor + 0.01, info.center.z);
+  cameraReadouts(pick); drawPlan(pick);
+}
+
+// ---------- camera readouts, focus & depth of field ----------
+const STOPS = [1.4, 2, 2.8, 4, 5.6, 8, 11, 16];
+const COC = Math.hypot(36, SENSOR_H) / 1443;     // circle of confusion, mm
+let fstop = 2.8, focusDist = Infinity;
+const stopBox = $('stops');
+STOPS.forEach(n => {
+  const b = document.createElement('button'); b.className = 'chip'; b.textContent = 'f/' + n;
+  b.onclick = () => { fstop = n; syncStops(); };
+  stopBox.appendChild(b);
+});
+function syncStops() { [...stopBox.children].forEach((b, i) => b.setAttribute('aria-pressed', STOPS[i] === fstop)); }
+const centerRay = new THREE.Raycaster();
+function measureFocus(pick) {
+  if (pick) return pick.depth;
+  centerRay.setFromCamera({ x: 0, y: 0 }, cam);
+  const hit = centerRay.intersectObject(setRoot, true).find(h => h.object.isMesh && h.object.visible);
+  return hit ? hit.distance : Infinity;
+}
+const fmtM = m => !isFinite(m) ? '∞' : m < 10 ? m.toFixed(2) + ' m' : m.toFixed(1) + ' m';
+function cameraReadouts(pick) {
+  const d = currentDir();
+  const hfov = THREE.MathUtils.radToDeg(2 * Math.atan(18 / rig.lens));
+  const floorY = pick ? pick.info.floor : bounds.min.y;
+  const pan = ((THREE.MathUtils.radToDeg(-currentYaw()) % 360) + 360) % 360;
+  set($('cLens'), `${rig.lens} mm`);
+  set($('cFov'), `${hfov.toFixed(0)}° wide`);
+  set($('cHeight'), fmtM(rig.y - floorY));
+  const tilt = THREE.MathUtils.radToDeg(Math.asin(THREE.MathUtils.clamp(d.y, -1, 1)));
+  set($('cTilt'), `${tilt >= 0 ? '+' : ''}${tilt.toFixed(0)}° ${Math.abs(tilt) < 2 ? 'level' : tilt > 0 ? 'up' : 'down'}`);
+  set($('cPan'), `${pan.toFixed(0)}°`);
+  focusDist = measureFocus(pick);
+  set($('cFocus'), fmtM(focusDist) + (pick ? ' (eyes)' : ''));
+  set($('cStop'), `f/${fstop}`);
+  if (!isFinite(focusDist)) { set($('cDof'), '—'); return; }
+  const f = rig.lens, s = focusDist * 1000, hyper = f * f / (fstop * COC) + f;
+  const near = s * (hyper - f) / (hyper + s - 2 * f) / 1000;
+  const far = s < hyper ? s * (hyper - f) / (hyper - s) / 1000 : Infinity;
+  set($('cDof'), `${fmtM(near).replace(' m', '')}–${fmtM(far)}`);
+}
+
+// ---------- shot sizes (place camera like a framing preset) ----------
+const SIZES = [['ECU', 'Eyes', .08, .065], ['CU', 'Face', .19, .08], ['MCU', 'Chest up', .32, .13], ['MS', 'Waist up', .50, .21],
+               ['MWS', 'Cowboy', .68, .29], ['FS', 'Head to toe', 1.2, .50], ['WS', 'In the space', 2.2, .55], ['EWS', 'Tiny', 5.0, .60]];
+const HEIGHTS = [["Worm's", -60], ['Low', -20], ['Eye', 0], ['High', 25], ["Bird's", 70]];
+let lastSize = null, elev = 0;
+const sizeBox = $('sizes'), heightBox = $('heights');
+SIZES.forEach(sz => {
+  const b = document.createElement('button'); b.className = 'size';
+  const bb = document.createElement('b'); bb.textContent = sz[0];
+  const sm = document.createElement('small'); sm.textContent = sz[1];
+  b.append(bb, sm); b.onclick = () => frameShot(sz[0]); sizeBox.appendChild(b);
+});
+HEIGHTS.forEach(([lab, deg]) => {
+  const b = document.createElement('button'); b.className = 'chip'; b.textContent = lab;
+  b.onclick = () => { elev = deg; syncPresets(); if (lastSize) frameShot(lastSize); };
+  heightBox.appendChild(b);
+});
+function syncPresets() {
+  [...sizeBox.children].forEach((b, i) => b.setAttribute('aria-pressed', SIZES[i][0] === lastSize));
+  [...heightBox.children].forEach((b, i) => b.setAttribute('aria-pressed', HEIGHTS[i][1] === elev));
+}
+function frameShot(id) {
+  const s = current || nearestSubject();
+  if (!s) { note('Add a subject first (Subjects tab), so the camera knows who to frame.', 4000); return; }
+  const sz = SIZES.find(z => z[0] === id), info = subjectInfo(s), h = info.h;
+  const frameH = sz[2] * h, dist = frameH * rig.lens / SENSOR_H;
+  const top = info.floor + h, aimY = top - sz[3] * h;
+  let dx = rig.x - info.center.x, dz = rig.z - info.center.z, l = Math.hypot(dx, dz);
+  if (l < 1e-3) { dx = info.fwd.x; dz = info.fwd.z; l = 1; }
+  dx /= l; dz /= l;
+  const t = Math.tan(THREE.MathUtils.degToRad(elev)), a = info.eye.y - aimY;
+  const A = 1 + t * t, B = 2 * a * t, C = a * a - dist * dist, disc = B * B - 4 * A * C;
+  const hd = Math.max(0.05, disc >= 0 ? (-B + Math.sqrt(disc)) / (2 * A) : dist);
+  rig.x = info.center.x + dx * hd; rig.z = info.center.z + dz * hd;
+  rig.y = info.eye.y + hd * t;
+  hIn.max = Math.max(+hIn.max, rig.y + 0.5); hIn.value = rig.y;
+  const vx = info.center.x - rig.x, vy = aimY - rig.y, vz = info.center.z - rig.z;
+  setLook(Math.atan2(-vx, -vz), Math.atan2(vy, Math.hypot(vx, vz)));
+  lastSize = id; syncPresets();
+}
+// moving by hand clears the highlighted preset
+const clearPreset = () => { if (lastSize) { lastSize = null; syncPresets(); } };
+stage.addEventListener('pointermove', e => { if (drag && !picking) clearPreset(); });
+stick.addEventListener('pointerdown', clearPreset);
+hIn.addEventListener('input', clearPreset);
+
+// ---------- tabs ----------
+const TABS = ['frame', 'plan', 'subj', 'set'];
+TABS.forEach(t => $('t-' + t).onclick = () => {
+  TABS.forEach(u => { $('t-' + u).setAttribute('aria-selected', u === t); $('p-' + u).hidden = u !== t; });
+  if (t === 'plan') sizePlan();
+});
+
+// ---------- floor plan ----------
+const plan = $('plan'), pctx = plan.getContext('2d');
+let footprints = [], planView = null;
+function buildFootprints() {
+  footprints = [];
+  const sb = bounds.getSize(new THREE.Vector3()), area = Math.max(1, sb.x * sb.z);
+  const subjObjs = new Set(subjects.map(s => s.obj));
+  let n = 0;
+  setRoot.traverse(o => {
+    if (!o.isMesh || n > 600) return;
+    for (let p = o; p; p = p.parent) if (subjObjs.has(p)) return;
+    const b = new THREE.Box3().setFromObject(o), sz = b.getSize(new THREE.Vector3());
+    if (sz.y < 0.25 || sz.x * sz.z > area * 0.5) return;      // skip floors, ceilings, decals
+    footprints.push([b.min.x, b.min.z, b.max.x, b.max.z, b.max.y]); n++;
+  });
+}
+function sizePlan() {
+  const r = plan.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+  if (r.width < 2) return;
+  plan.width = Math.round(r.width * dpr); plan.height = Math.round(r.height * dpr);
+  const pad = 1.2, minX = bounds.min.x - pad, maxX = bounds.max.x + pad, minZ = bounds.min.z - pad, maxZ = bounds.max.z + pad;
+  const sc = Math.min(plan.width / (maxX - minX), plan.height / (maxZ - minZ));
+  planView = { sc, ox: (plan.width - (maxX - minX) * sc) / 2 - minX * sc, oz: (plan.height - (maxZ - minZ) * sc) / 2 - minZ * sc, dpr };
+}
+new ResizeObserver(() => { if (!$('p-plan').hidden) sizePlan(); }).observe(plan);
+const PX = x => planView.ox + x * planView.sc, PZ = z => planView.oz + z * planView.sc;
+function drawPlan(pick) {
+  if ($('p-plan').hidden || !planView) return;
+  const c = pctx, W2 = plan.width, H2 = plan.height, sc = planView.sc, k = planView.dpr;
+  c.clearRect(0, 0, W2, H2);
+  c.strokeStyle = 'rgba(255,255,255,.06)'; c.lineWidth = 1;
+  for (let x = Math.ceil(bounds.min.x - 1.2); x <= bounds.max.x + 1.2; x++) { c.beginPath(); c.moveTo(PX(x), 0); c.lineTo(PX(x), H2); c.stroke(); }
+  for (let z = Math.ceil(bounds.min.z - 1.2); z <= bounds.max.z + 1.2; z++) { c.beginPath(); c.moveTo(0, PZ(z)); c.lineTo(W2, PZ(z)); c.stroke(); }
+  c.strokeStyle = 'rgba(255,255,255,.25)'; c.setLineDash([4 * k, 4 * k]);
+  c.strokeRect(PX(bounds.min.x), PZ(bounds.min.z), (bounds.max.x - bounds.min.x) * sc, (bounds.max.z - bounds.min.z) * sc);
+  c.setLineDash([]);
+  footprints.forEach(f => { c.fillStyle = f[4] - bounds.min.y > 2 ? '#454952' : '#33363c'; c.fillRect(PX(f[0]), PZ(f[1]), (f[2] - f[0]) * sc, (f[3] - f[1]) * sc); });
+  // zones around the framed subject
+  if (pick) {
+    const ci = pick.info.center;
+    ZONES.forEach(z => { c.strokeStyle = '#' + z[3].toString(16).padStart(6, '0') + 'aa'; c.lineWidth = 1.5 * k; c.beginPath(); c.arc(PX(ci.x), PZ(ci.z), z[0] * sc, 0, Math.PI * 2); c.stroke(); });
+  }
+  // camera field of view
+  const yaw = currentYaw(), half = Math.atan(18 / rig.lens), reach = Math.min(isFinite(focusDist) ? Math.max(focusDist, 1.5) : 6, 25);
+  const fx = a => rig.x - Math.sin(a) * reach, fz = a => rig.z - Math.cos(a) * reach;
+  c.fillStyle = 'rgba(242,177,52,.16)'; c.strokeStyle = 'rgba(242,177,52,.85)'; c.lineWidth = 1.5 * k;
+  c.beginPath(); c.moveTo(PX(rig.x), PZ(rig.z)); c.lineTo(PX(fx(yaw + half)), PZ(fz(yaw + half))); c.lineTo(PX(fx(yaw - half)), PZ(fz(yaw - half))); c.closePath(); c.fill(); c.stroke();
+  // subjects
+  c.font = `${11 * k}px "Archivo Narrow", sans-serif`;
+  subjects.forEach(s => {
+    if (!s.obj.parent) return;
+    const i = subjectInfo(s), x = PX(i.center.x), z = PZ(i.center.z), r = Math.max(4 * k, 0.22 * sc);
+    c.fillStyle = s === (pick && pick.s) ? '#f2b134' : '#cfd6df';
+    c.beginPath(); c.arc(x, z, r, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = c.fillStyle; c.lineWidth = 2 * k; c.beginPath(); c.moveTo(x, z); c.lineTo(x + i.fwd.x * r * 2.2, z + i.fwd.z * r * 2.2); c.stroke();
+    c.fillText(s.name, x + r + 4 * k, z - r);
+  });
+  // camera body
+  c.fillStyle = '#f2b134'; c.beginPath(); c.arc(PX(rig.x), PZ(rig.z), 5 * k, 0, Math.PI * 2); c.fill();
+  c.fillStyle = 'rgba(255,255,255,.55)'; c.fillText('BACK OF SET', 6 * k, 14 * k);
+}
+let planDrag = false;
+function planMove(e) {
+  if (!planView) return;
+  const r = plan.getBoundingClientRect();
+  const px = (e.clientX - r.left) * plan.width / r.width, pz = (e.clientY - r.top) * plan.height / r.height;
+  rig.x = THREE.MathUtils.clamp((px - planView.ox) / planView.sc, bounds.min.x - 3, bounds.max.x + 3);
+  rig.z = THREE.MathUtils.clamp((pz - planView.oz) / planView.sc, bounds.min.z - 3, bounds.max.z + 3);
+  clearPreset();
+}
+plan.addEventListener('pointerdown', e => { planDrag = true; plan.setPointerCapture(e.pointerId); planMove(e); });
+plan.addEventListener('pointermove', e => { if (planDrag) planMove(e); });
+plan.addEventListener('pointerup', () => { planDrag = false; });
+plan.addEventListener('pointercancel', () => { planDrag = false; });
+
+// ---------- capture (frames live in memory until saved) ----------
+let shots = [], dirty = false, setGlb = null, setLabel = 'Sample diner';
+function markDirty(v) {
+  dirty = v;
+  const b = $('save'); b.classList.toggle('dirty', v);
+  b.textContent = 'Save project';
+  if (v && shots.length) { const n = document.createElement('span'); n.className = 'n'; n.textContent = shots.length; b.append(n); }
+}
+function confirmNew() {
+  // No confirm() dialogs in this viewer, so warn once and ask for a second try.
+  if (confirmNew.armed) { confirmNew.armed = false; return true; }
+  confirmNew.armed = true; setTimeout(() => confirmNew.armed = false, 8000);
+  note('You have unsaved frames. Save project first, or open the file again to discard them.', 8000);
+  return false;
+}
+function clearShots() { shots = []; $('strip').textContent = ''; markDirty(false); }
+function renderStrip() {
+  const strip = $('strip'); strip.textContent = '';
+  shots.forEach((shot, i) => {
+    const t = document.createElement('div'); t.className = 'thumb';
+    const go = document.createElement('button'); go.className = 'go'; go.title = 'Jump back to this setup';
+    const img = document.createElement('img'); img.alt = `Frame ${i + 1}`; img.src = shot.url;
+    const sm = document.createElement('small'); sm.textContent = `${String(i + 1).padStart(2, '0')} ${shot.label}`;
+    go.append(img, sm);
+    go.onclick = () => {
+      Object.assign(rig, { x: shot.x, y: shot.y, z: shot.z, lens: shot.lens });
+      if (shot.fstop) { fstop = shot.fstop; syncStops(); }
+      hIn.value = shot.y; syncLens(); setLook(shot.yaw, shot.pitch);
+    };
+    const inp = document.createElement('input'); inp.id = 'note-' + i; inp.placeholder = 'What happens here?'; inp.value = shot.note || '';
+    inp.setAttribute('aria-label', `Note for frame ${i + 1}`);
+    inp.oninput = () => { shot.note = inp.value; markDirty(true); };
+    const x = document.createElement('button'); x.className = 'x'; x.textContent = '×'; x.setAttribute('aria-label', `Delete frame ${i + 1}`);
+    x.onclick = () => { shots.splice(i, 1); renderStrip(); markDirty(true); };
+    t.append(go, inp, x); strip.append(t);
+  });
+}
+$('capture').onclick = () => {
+  renderer.render(scene, cam);
+  const c = document.createElement('canvas'); c.width = 640; c.height = 360;
+  const dpr = renderer.getPixelRatio();
+  c.getContext('2d').drawImage(canvas, (W - fw) / 2 * dpr, (H - fh) / 2 * dpr, fw * dpr, fh * dpr, 0, 0, 640, 360);
+  const d = currentDir();
+  shots.push({ url: c.toDataURL('image/jpeg', 0.82), label: lastShot, note: '', x: rig.x, y: rig.y, z: rig.z, lens: rig.lens, fstop,
+               yaw: Math.atan2(-d.x, -d.z), pitch: Math.asin(THREE.MathUtils.clamp(d.y, -1, 1)) });
+  renderStrip(); markDirty(true);
+  const last = $('strip').lastElementChild; if (last) last.scrollIntoView({ inline: 'end', block: 'nearest' });
+  const f = $('flash'); f.classList.add('on'); requestAnimationFrame(() => requestAnimationFrame(() => f.classList.remove('on')));
+};
+addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+
+// ---------- downloads (Claude viewer capability, or a normal browser download) ----------
+const inClaude = !!(window.claude && window.claude.use);
+const dlReady = inClaude ? window.claude.use('downloads').catch(() => null) : Promise.resolve(null);
+async function offerFile(filename, blob) {
+  if (inClaude) {
+    const dl = await dlReady;
+    if (!dl) { note('Downloads are turned off in this view. Open the standalone Set Viewfinder page to save.', 6000); return false; }
+    try { await dl.save({ filename, data: blob }); return true; }
+    catch (e) {
+      if (e && e.code === 'declined') return false;
+      note(e && e.code === 'rate_limited' ? 'A save is already waiting for you. Finish that one first.' : `Couldn't save the file (${(e && e.code) || 'error'}).`, 6000);
+      return false;
+    }
+  }
+  const url = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = url; a.download = filename; document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 30000);
+  return true;
+}
+const slug = t => (t || 'project').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'project';
+const stamp = () => new Date().toISOString().slice(0, 10);
+function bufToB64(buf) {
+  const bytes = new Uint8Array(buf); let bin = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(bin);
+}
+function b64ToBuf(b64) {
+  const bin = atob(b64), out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out.buffer;
+}
+
+$('save').onclick = async () => {
+  const project = {
+    app: 'set-viewfinder', version: 1, savedAt: new Date().toISOString(),
+    set: { name: setLabel, glb: setGlb ? bufToB64(setGlb) : null },
+    camera: { x: rig.x, y: rig.y, z: rig.z, lens: rig.lens, fstop, yaw: currentYaw(), pitch: Math.asin(THREE.MathUtils.clamp(currentDir().y, -1, 1)) },
+    subjects: subjects.map(s => ({ name: s.name, node: s.obj.name })),
+    shots: shots.map(({ url, label, note, x, y, z, lens, fstop, yaw, pitch }) => ({ url, label, note, x, y, z, lens, fstop, yaw, pitch }))
+  };
+  const blob = new Blob([JSON.stringify(project)], { type: 'application/json' });
+  if (await offerFile(`${slug(setLabel)}-${stamp()}.json`, blob)) {
+    markDirty(false);
+    note(`Saved ${shots.length} frame${shots.length === 1 ? '' : 's'}. Open that file here next time to pick up where you left off.`, 5000);
+  }
+};
+
+function openProject(file) {
+  if (dirty && !confirmNew()) return;
+  file.text().then(txt => {
+    let p; try { p = JSON.parse(txt); } catch (e) { note("That .json isn't a Set Viewfinder project."); return; }
+    if (!p || p.app !== 'set-viewfinder') { note("That .json isn't a Set Viewfinder project."); return; }
+    note('Opening project…');
+    const finish = (root, cams) => {
+      clearShots();
+      setLabel = (p.set && p.set.name) || 'Untitled set';
+      useSet(root, setLabel, cams);
+      // restore subjects by their Blender object name
+      if (Array.isArray(p.subjects)) {
+        p.subjects.forEach(ps => {
+          if (subjects.some(s => s.obj.name === ps.node)) return;
+          const o = root.getObjectByName(ps.node);
+          if (o) subjects.push({ name: ps.name || cleanName(o.name), obj: o });
+        });
+        renderSubs(); buildFootprints();
+      }
+      const c = p.camera;
+      if (c) {
+        Object.assign(rig, { x: c.x, y: c.y, z: c.z, lens: c.lens || rig.lens });
+        if (c.fstop) fstop = c.fstop;
+        hIn.value = rig.y; syncLens(); syncStops(); setLook(c.yaw || 0, c.pitch || 0);
+      }
+      shots = Array.isArray(p.shots) ? p.shots.filter(s => s && typeof s.url === 'string' && s.url.startsWith('data:image/')) : [];
+      renderStrip(); markDirty(false);
+      note(`Opened ${setLabel} with ${shots.length} frame${shots.length === 1 ? '' : 's'}.`, 4000);
+    };
+    if (p.set && p.set.glb) {
+      let buf; try { buf = b64ToBuf(p.set.glb); } catch (e) { note('The set inside this project is damaged.'); return; }
+      const keep = buf.slice(0);
+      new THREE.GLTFLoader().parse(buf, '', g => { setGlb = keep; finish(g.scene, g.cameras); }, () => note("Couldn't read the set inside this project."));
+    } else { setGlb = null; finish(buildSample(), null); }
+  }).catch(() => note("Couldn't open that file."));
+}
+
+// ---------- storyboard page to hand in ----------
+const esc = t => String(t || '').replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+$('board').onclick = async () => {
+  if (!shots.length) { note('Capture some frames first.', 3000); return; }
+  const cards = shots.map((s, i) => `<figure><div class="no">${String(i + 1).padStart(2, '0')}</div><img src="${s.url}" alt="Frame ${i + 1}"><figcaption><b>${esc(s.label)}</b><p>${esc(s.note) || '&nbsp;'}</p></figcaption></figure>`).join('');
+  const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(setLabel)} storyboard</title>
+<style>body{font:14px -apple-system,Segoe UI,Helvetica,sans-serif;margin:24px;color:#111;background:#fff}h1{font-size:20px;margin:0 0 4px}.sub{color:#666;margin:0 0 18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}figure{margin:0;border:1px solid #ccc;border-radius:6px;overflow:hidden;position:relative;break-inside:avoid}
+img{display:block;width:100%;background:#000}.no{position:absolute;left:8px;top:6px;color:#fff;font-weight:700;text-shadow:0 1px 3px #000}
+figcaption{padding:8px 10px}b{font-size:12px}p{margin:6px 0 0;min-height:2.6em;border-bottom:1px dotted #bbb}</style></head>
+<body><h1>${esc(setLabel)}</h1><p class="sub">Storyboard · ${shots.length} frames · ${stamp()}</p><div class="grid">${cards}</div></body></html>`;
+  if (await offerFile(`${slug(setLabel)}-storyboard.html`, new Blob([html], { type: 'text/html' })))
+    note('Storyboard downloaded. It opens in any browser and prints from there.', 4000);
+};
+
+// ---------- loop ----------
+let last = performance.now(), tick = 0;
+const yq = new THREE.Quaternion(), yAxis = new THREE.Vector3(0, 1, 0), lookE = new THREE.Euler(0, 0, 0, 'YXZ');
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (gyro) cam.quaternion.copy(yq.setFromAxisAngle(yAxis, yawOffset)).multiply(devQ);
+  else cam.quaternion.setFromEuler(lookE.set(rig.pitch, rig.yaw, 0));
+  let mx = joy.x, my = joy.y;
+  if (keys.w || keys.arrowup) my -= 1; if (keys.s || keys.arrowdown) my += 1;
+  if (keys.a || keys.arrowleft) mx -= 1; if (keys.d || keys.arrowright) mx += 1;
+  if (keys.q) { rig.y = Math.max(+hIn.min, rig.y - dt); hIn.value = rig.y; }
+  if (keys.e) { rig.y = Math.min(+hIn.max, rig.y + dt); hIn.value = rig.y; }
+  if (mx || my) {
+    const yaw = currentYaw(), sp = 1.3 * dt;
+    rig.x += (Math.sin(yaw) * my + Math.cos(yaw) * mx) * sp;
+    rig.z += (Math.cos(yaw) * my - Math.sin(yaw) * mx) * sp;
+    rig.x = THREE.MathUtils.clamp(rig.x, bounds.min.x - 3, bounds.max.x + 3);
+    rig.z = THREE.MathUtils.clamp(rig.z, bounds.min.z - 3, bounds.max.z + 3);
+  }
+  cam.position.set(rig.x, rig.y, rig.z);
+  $('hv').textContent = (rig.y - bounds.min.y).toFixed(2) + ' m';
+  if (tick++ % 6 === 0) readouts();
+  renderer.render(scene, cam);
+  requestAnimationFrame(frame);
+}
+
+applyWork(); syncLens(); syncStops(); syncPresets();
+useSet(buildSample(), 'Sample diner', null);
+rig.x = 1.9; rig.z = 2.2; rig.y = 1.6; syncHeight(); faceSubject();
+layout();
+requestAnimationFrame(frame);
+})();
+</script>

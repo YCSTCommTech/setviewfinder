@@ -1,3 +1,11 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>body{margin:0}</style>
+</head>
+<body>
 <title>Set Viewfinder</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,6 +24,7 @@
   color-scheme:dark;
 }
 html,body{height:100%}
+[hidden]{display:none!important}  /* keep hidden panels hidden even where a class sets display */
 body{background:var(--bg);color:var(--fg);font-family:var(--f-ui);font-size:14px;overflow:hidden;-webkit-user-select:none;user-select:none}
 *{box-sizing:border-box}
 button,input{font:inherit;color:inherit}
@@ -55,7 +64,8 @@ button,label.btn{cursor:pointer}
 .btn.load{flex:none;border-color:var(--accent);color:var(--accent)}
 .btn.rec{border-color:var(--rec);color:#fff;background:#3a1714}
 .btn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
-.slider{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);flex:1 1 180px;min-width:0}
+.slider{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);flex:none;min-width:0}
+.row .slider{flex:1 1 180px}
 .slider span{min-width:72px}
 .slider input{flex:1;accent-color:var(--accent);min-width:0}
 .slider output{font-family:var(--f-mono);color:var(--fg);min-width:50px;text-align:right;font-variant-numeric:tabular-nums}
@@ -152,6 +162,22 @@ details ol{margin:6px 0 0;padding-left:18px;line-height:1.5}
 .film img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
 .film span{position:absolute;left:4px;top:2px;font-family:var(--f-mono);font-size:10px;color:#fff;text-shadow:0 1px 2px #000}
 .bv-empty{display:grid;place-items:center;height:100%;color:var(--muted);text-align:center;padding:24px}
+.cast{display:flex;flex-direction:column;gap:6px;border:1px solid var(--line);border-radius:6px;padding:8px;background:var(--panel)}
+.cast select,.cast input[type=text]{background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:7px 8px;min-width:0;flex:1 1 120px;font-size:13px}
+.cast .btn{padding:8px 8px;font-size:12px}
+.pm{position:fixed;inset:0;z-index:60;background:rgba(5,5,7,.86);display:grid;place-items:center;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:calc(12px + env(safe-area-inset-top,0px)) calc(12px + env(safe-area-inset-bottom,0px))}
+.pm-box{width:min(720px,100%);max-height:100%;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.pm-box header{display:flex;align-items:center;gap:10px}
+.pm-box header .btn,.pm-box .row .btn.load{flex:none}
+.pm-box h2{margin:0;flex:1;font-size:16px;letter-spacing:.06em;text-transform:uppercase}
+.pm-stage{position:relative;background:#000;border-radius:6px;overflow:hidden;aspect-ratio:4/3;display:grid;place-items:center}
+.pm-stage video,.pm-stage canvas{max-width:100%;max-height:100%;display:block}
+.pm-msg{position:absolute;inset:auto 8px 8px;background:rgba(18,19,22,.92);border:1px solid var(--line);border-radius:6px;padding:7px 10px;font-size:12.5px;text-align:center}
+.pm-msg:empty{display:none}
+.tog{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);cursor:pointer;flex:1}
+.tog input{accent-color:var(--accent);width:16px;height:16px;margin:0}
+.btn:disabled{opacity:.4;cursor:default}
 @media (max-width:600px){.lp-info{grid-template-columns:1fr}.lp-acts{grid-row:auto;grid-column:auto;flex-wrap:wrap}.film button{width:88px}}
 
 @media (orientation:landscape) and (max-height:600px), (min-width:1000px){
@@ -240,6 +266,22 @@ details ol{margin:6px 0 0;padding-left:18px;line-height:1.5}
     </div>
 
     <div class="pane" id="p-subj" role="tabpanel" hidden>
+      <div class="cast" id="castBox">
+        <span class="lbl">Cast: poseable mannequins</span>
+        <div class="row">
+          <button class="btn" id="mqAdd">Add mannequin</button>
+          <select id="mqSel" aria-label="Choose mannequin"></select>
+          <input type="text" id="mqName" aria-label="Mannequin name" placeholder="Name">
+        </div>
+        <div class="row">
+          <button class="btn load" id="mqPose">Pose from photo</button>
+          <button class="btn" id="mqMove">Move</button>
+          <button class="btn" id="mqStand">Stand</button>
+          <button class="btn" id="mqDel">Remove</button>
+        </div>
+        <label class="slider" for="mqTurn"><span>Facing</span><input id="mqTurn" type="range" min="-180" max="180" step="1" value="0"><output id="mqTurnV">0°</output></label>
+        <p class="hint">Each captured frame remembers every mannequin's pose and spot, so going back to a frame puts the cast back too.</p>
+      </div>
       <div class="subs" id="subs"></div>
       <div class="row">
         <button class="btn" id="pick" aria-pressed="false">Tap to add subject</button>
@@ -268,6 +310,24 @@ details ol{margin:6px 0 0;padding-left:18px;line-height:1.5}
     </div>
   </aside>
 </div>
+
+<section class="pm" id="pm" hidden aria-label="Pose from photo">
+  <div class="pm-box">
+    <header><h2 id="pmTitle">Pose from a photo</h2><button class="btn" id="pmClose">Close</button></header>
+    <div class="pm-stage"><video id="pmVideo" playsinline muted hidden></video><canvas id="pmCanvas" width="640" height="480"></canvas><div class="pm-msg" id="pmMsg"></div></div>
+    <div class="row">
+      <button class="btn" id="pmCam">Use camera</button>
+      <button class="btn rec" id="pmSnap" hidden>Snap</button>
+      <label class="btn" for="pmFile">Choose photo</label>
+      <input class="sr" type="file" id="pmFile" accept="image/*">
+    </div>
+    <div class="row">
+      <label class="tog" for="pmMirror"><input type="checkbox" id="pmMirror"> Photo is mirrored (selfie)</label>
+      <button class="btn load" id="pmApply" disabled>Apply pose</button>
+    </div>
+    <p class="hint">Have someone act out the moment with their whole body in the picture. The photo stays on this device and is never saved; only the pose is kept.</p>
+  </div>
+</section>
 
 <section class="bv" id="bv" hidden aria-label="Storyboard review">
   <div class="bv-top">
@@ -345,6 +405,7 @@ function disposeTree(o) {
 function clearSet() {
   [...setRoot.children].forEach(c => { setRoot.remove(c); disposeTree(c); });
   setLights = []; subjects = []; blenderCam = null; $('bcam').hidden = true;
+  clearCast();
 }
 
 // ---------- sample diner (shown until you load your own set) ----------
@@ -533,6 +594,13 @@ function setLook(yaw, pitch) {
 
 // ---------- subjects ----------
 function subjectInfo(s) {
+  if (s.mq) {
+    const r = s.mq.root, p = r.position, head = new THREE.Vector3();
+    r.updateMatrixWorld(true); s.mq.J.head.getWorldPosition(head);
+    const f = new THREE.Vector3(Math.sin(r.rotation.y), 0, Math.cos(r.rotation.y));
+    const h = Math.max(0.6, head.y + 0.12 - p.y);
+    return { h, floor: p.y, center: new THREE.Vector3(p.x, p.y, p.z), eye: new THREE.Vector3(head.x, head.y, head.z), fwd: f };
+  }
   const b = new THREE.Box3().setFromObject(s.obj);
   const h = Math.max(0.05, b.max.y - b.min.y);
   const cx = (b.min.x + b.max.x) / 2, cz = (b.min.z + b.max.z) / 2;
@@ -648,7 +716,7 @@ stage.addEventListener('pointermove', e => {
   const k = THREE.MathUtils.degToRad(cam.fov) / H;
   const dx = (e.clientX - drag.x) * k, dy = (e.clientY - drag.y) * k;
   drag.x = e.clientX; drag.y = e.clientY;
-  if (picking) return;
+  if (picking || placing) return;
   if (gyro) yawOffset += dx;
   else { rig.yaw += dx; rig.pitch = THREE.MathUtils.clamp(rig.pitch + dy, -1.45, 1.45); }
 });
@@ -657,6 +725,7 @@ stage.addEventListener('pointerup', e => {
   const moved = Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy);
   drag = null;
   if (picking && moved < 8) pickAt(e.clientX, e.clientY);
+  else if (placing && moved < 8) placeAt(e.clientX, e.clientY);
 });
 stage.addEventListener('pointercancel', () => { drag = null; });
 
@@ -675,7 +744,7 @@ stick.addEventListener('pointermove', e => { if (e.pointerId === joy.id) moveJoy
 const endJoy = e => { if (e.pointerId === joy.id) { joy.id = null; joy.x = joy.y = 0; setKnob(); } };
 stick.addEventListener('pointerup', endJoy); stick.addEventListener('pointercancel', endJoy);
 const keys = {};
-addEventListener('keydown', e => { if (!/INPUT|TEXTAREA/.test(e.target.tagName) && $('bv').hidden) keys[e.key.toLowerCase()] = true; });
+addEventListener('keydown', e => { if (!/INPUT|TEXTAREA|SELECT/.test(e.target.tagName) && $('bv').hidden && $('pm').hidden) keys[e.key.toLowerCase()] = true; });
 addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
 
 // set lighting sliders
@@ -735,7 +804,7 @@ const centerRay = new THREE.Raycaster();
 function measureFocus(pick) {
   if (pick) return pick.depth;
   centerRay.setFromCamera({ x: 0, y: 0 }, cam);
-  const hit = centerRay.intersectObject(setRoot, true).find(h => h.object.isMesh && h.object.visible);
+  const hit = centerRay.intersectObjects([setRoot, castRoot], true).find(h => h.object.isMesh && h.object.visible);
   return hit ? hit.distance : Infinity;
 }
 const fmtM = m => !isFinite(m) ? '∞' : m < 10 ? m.toFixed(2) + ' m' : m.toFixed(1) + ' m';
@@ -888,6 +957,270 @@ plan.addEventListener('pointermove', e => { if (planDrag) planMove(e); });
 plan.addEventListener('pointerup', () => { planDrag = false; });
 plan.addEventListener('pointercancel', () => { planDrag = false; });
 
+// ---------- cast: poseable mannequins ----------
+const castRoot = new THREE.Group(); scene.add(castRoot);
+let cast = [], castSel = null, placing = false, castCounter = 0;
+const CAST_COLORS = [0xd9a066, 0x7fb3d5, 0xc39bd3, 0x82c99a, 0xe59866, 0xcfd3d8];
+const JOINTS = ['hips', 'chest', 'neck', 'upperArmL', 'foreArmL', 'upperArmR', 'foreArmR', 'thighL', 'shinL', 'footL', 'thighR', 'shinR', 'footR'];
+const REST_HIP_Y = 0.92;
+function makeMannequin(color) {
+  const skin = new THREE.MeshStandardMaterial({ color, roughness: 0.55 });
+  const dark = new THREE.MeshStandardMaterial({ color: 0x2b2d31, roughness: 0.6 });
+  const root = new THREE.Group(), J = {};
+  const joint = (name, parent, x, y, z) => { const g = new THREE.Group(); g.name = name; g.position.set(x, y, z); parent.add(g); J[name] = g; return g; };
+  const mesh = (parent, geo, mat, x, y, z) => { const o = new THREE.Mesh(geo, mat); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; parent.add(o); return o; };
+  const limb = (parent, len, rJoint, rEnd) => { mesh(parent, new THREE.CylinderGeometry(rJoint, rEnd, len, 14), skin, 0, -len / 2, 0); mesh(parent, new THREE.SphereGeometry(rJoint * 1.05, 14, 10), dark, 0, 0, 0); };
+  const hips = joint('hips', root, 0, REST_HIP_Y, 0);
+  mesh(hips, new THREE.BoxGeometry(0.30, 0.16, 0.18), skin, 0, 0, 0);
+  const chest = joint('chest', hips, 0, 0.08, 0);
+  mesh(chest, new THREE.CylinderGeometry(0.17, 0.13, 0.36, 16), skin, 0, 0.18, 0);
+  mesh(chest, new THREE.BoxGeometry(0.40, 0.08, 0.16), skin, 0, 0.34, 0);
+  const neck = joint('neck', chest, 0, 0.38, 0);
+  mesh(neck, new THREE.CylinderGeometry(0.045, 0.05, 0.12, 10), dark, 0, 0.05, 0);
+  J.head = mesh(neck, new THREE.SphereGeometry(0.115, 20, 14), skin, 0, 0.21, 0);
+  mesh(neck, new THREE.BoxGeometry(0.045, 0.045, 0.06), skin, 0, 0.20, 0.12);   // nose: shows facing
+  [['L', 1], ['R', -1]].forEach(([side, sx]) => {
+    const ua = joint('upperArm' + side, chest, 0.21 * sx, 0.33, 0); limb(ua, 0.29, 0.05, 0.042);
+    const fa = joint('foreArm' + side, ua, 0, -0.29, 0); limb(fa, 0.26, 0.042, 0.034);
+    mesh(fa, new THREE.SphereGeometry(0.045, 12, 8), skin, 0, -0.29, 0);
+    const th = joint('thigh' + side, hips, 0.095 * sx, -0.04, 0); limb(th, 0.43, 0.075, 0.055);
+    const sh = joint('shin' + side, th, 0, -0.43, 0); limb(sh, 0.41, 0.055, 0.042);
+    const ft = joint('foot' + side, sh, 0, -0.41, 0);
+    mesh(ft, new THREE.BoxGeometry(0.09, 0.06, 0.24), dark, 0, -0.01, 0.07);
+  });
+  return { root, J };
+}
+function addMannequin(pos, yaw, opts = {}) {
+  const color = opts.color ?? CAST_COLORS[cast.length % CAST_COLORS.length];
+  const { root, J } = makeMannequin(color);
+  const id = opts.id || 'mq' + Date.now().toString(36) + (castCounter++);
+  const name = opts.name || `Actor ${String.fromCharCode(65 + (cast.length % 26))}`;
+  root.name = name; root.position.copy(pos); root.rotation.y = yaw;
+  castRoot.add(root);
+  const mq = { id, name, color, root, J };
+  cast.push(mq);
+  subjects.push({ name, obj: root, mq });
+  castSel = mq; renderCast(); renderSubs();
+  return mq;
+}
+function removeMannequin(mq) {
+  castRoot.remove(mq.root); disposeTree(mq.root);
+  cast = cast.filter(c => c !== mq); subjects = subjects.filter(s => s.mq !== mq);
+  if (castSel === mq) castSel = cast[0] || null;
+  renderCast(); renderSubs();
+}
+function clearCast() {
+  [...castRoot.children].forEach(c => { castRoot.remove(c); disposeTree(c); });
+  cast = []; castSel = null; renderCast();
+}
+function renderCast() {
+  const sel = $('mqSel'); sel.textContent = '';
+  if (!cast.length) { const o = document.createElement('option'); o.textContent = 'No mannequins yet'; sel.append(o); }
+  cast.forEach(c => { const o = document.createElement('option'); o.value = c.id; o.textContent = c.name; o.selected = c === castSel; sel.append(o); });
+  const on = !!castSel;
+  ['mqSel', 'mqName', 'mqPose', 'mqMove', 'mqStand', 'mqDel', 'mqTurn'].forEach(id => $(id).disabled = !on);
+  $('mqName').value = on ? castSel.name : '';
+  const deg = on ? Math.round(THREE.MathUtils.radToDeg(castSel.root.rotation.y)) : 0;
+  $('mqTurn').value = ((deg + 540) % 360) - 180; $('mqTurnV').textContent = $('mqTurn').value + '°';
+}
+$('mqSel').onchange = e => { castSel = cast.find(c => c.id === e.target.value) || null; renderCast(); };
+$('mqName').oninput = e => {
+  if (!castSel) return;
+  castSel.name = e.target.value || castSel.name; castSel.root.name = castSel.name;
+  const s = subjects.find(x => x.mq === castSel); if (s) s.name = castSel.name;
+  [...$('mqSel').options].forEach(o => { if (o.value === castSel.id) o.textContent = castSel.name; });
+  renderSubs(); markDirty(true);
+};
+$('mqTurn').oninput = e => { if (!castSel) return; castSel.root.rotation.y = THREE.MathUtils.degToRad(+e.target.value); $('mqTurnV').textContent = e.target.value + '°'; markDirty(true); };
+$('mqStand').onclick = () => { if (castSel) { standPose(castSel); markDirty(true); } };
+$('mqDel').onclick = () => { if (castSel) { removeMannequin(castSel); markDirty(true); } };
+let placeTarget = null;
+function startPlacing(target) {
+  placing = true; placeTarget = target; picking = false; $('pick').setAttribute('aria-pressed', 'false');
+  stage.classList.add('picking');
+  note(target ? `Tap the floor where ${target.name} should stand.` : 'Tap the floor where the mannequin should stand.');
+}
+$('mqAdd').onclick = () => startPlacing(null);
+$('mqMove').onclick = () => { if (castSel) startPlacing(castSel); };
+function placeAt(cx, cy) {
+  placing = false; stage.classList.remove('picking');
+  const r = stage.getBoundingClientRect();
+  ray.setFromCamera({ x: (cx - r.left) / r.width * 2 - 1, y: -((cy - r.top) / r.height) * 2 + 1 }, cam);
+  let p = null;
+  const hits = ray.intersectObject(setRoot, true).filter(h => h.object.isMesh && h.object.visible && h.face);
+  for (const h of hits) {
+    const n = h.face.normal.clone().transformDirection(h.object.matrixWorld);
+    if (n.y > 0.7) { p = h.point.clone(); break; }
+    break;   // first thing hit is a wall or prop: fall back to the floor plane
+  }
+  if (!p) {
+    const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -bounds.min.y), q = new THREE.Vector3();
+    if (ray.ray.intersectPlane(plane, q)) p = q;
+  }
+  if (!p) { note('Aim at the floor and tap again.', 3000); return; }
+  const yaw = Math.atan2(cam.position.x - p.x, cam.position.z - p.z);   // face the camera
+  if (placeTarget) { placeTarget.root.position.copy(p); }
+  else addMannequin(p, yaw);
+  placeTarget = null; renderCast(); buildFootprints(); markDirty(true);
+  note('', 1);
+}
+
+// --- pose solving: MediaPipe world landmarks -> mannequin joints ---
+const LM = { nose: 0, earL: 7, earR: 8, shL: 11, shR: 12, elL: 13, elR: 14, wrL: 15, wrR: 16, hipL: 23, hipR: 24, knL: 25, knR: 26, anL: 27, anR: 28, toeL: 31, toeR: 32 };
+const SWAP = [[1, 4], [2, 5], [3, 6], [7, 8], [9, 10], [11, 12], [13, 14], [15, 16], [17, 18], [19, 20], [21, 22], [23, 24], [25, 26], [27, 28], [29, 30], [31, 32]];
+const DOWN = new THREE.Vector3(0, -1, 0), FWD = new THREE.Vector3(0, 0, 1);
+function basisQ(xv, upv) {
+  const X = xv.clone().normalize(), Z = X.clone().cross(upv).normalize(), Y = Z.clone().cross(X);
+  return new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(X, Y, Z));
+}
+function standPose(mq) {
+  JOINTS.forEach(n => mq.J[n].quaternion.identity());
+  mq.J.hips.position.y = REST_HIP_Y;
+}
+// Landmarks: x right, y down, z away from camera (metres, hip-centred). Mannequin space: x = its left, y up, z forward.
+function applyLandmarks(mq, lms, mirror) {
+  let L = lms.map(l => ({ x: l.x, y: l.y, z: l.z, v: l.visibility ?? 1 }));
+  if (mirror) { L = L.map(l => ({ ...l, x: -l.x })); SWAP.forEach(([a, b]) => { const t = L[a]; L[a] = L[b]; L[b] = t; }); }
+  const P = L.map(l => new THREE.Vector3(l.x, -l.y, -l.z));
+  const ok = (...ids) => ids.every(i => L[i] && L[i].v > 0.35);
+  const mid = (a, b) => P[a].clone().add(P[b]).multiplyScalar(0.5);
+  if (!ok(LM.shL, LM.shR, LM.hipL, LM.hipR)) return false;
+  // Keep the set's facing: remove the body's turn relative to the photo camera.
+  let up = mid(LM.shL, LM.shR).sub(mid(LM.hipL, LM.hipR));
+  const z0 = P[LM.hipL].clone().sub(P[LM.hipR]).cross(up);
+  const unturn = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), -Math.atan2(z0.x, z0.z));
+  P.forEach(p => p.applyQuaternion(unturn));
+  up = mid(LM.shL, LM.shR).sub(mid(LM.hipL, LM.hipR));
+  const J = mq.J;
+  const hipsQ = basisQ(P[LM.hipL].clone().sub(P[LM.hipR]), up);
+  const chestQ = basisQ(P[LM.shL].clone().sub(P[LM.shR]), up);
+  J.hips.quaternion.copy(hipsQ);
+  J.chest.quaternion.copy(hipsQ.clone().invert().multiply(chestQ));
+  if (ok(LM.earL, LM.earR)) {
+    const headUp = mid(LM.earL, LM.earR).sub(mid(LM.shL, LM.shR));
+    J.neck.quaternion.copy(chestQ.clone().invert().multiply(basisQ(P[LM.earL].clone().sub(P[LM.earR]), headUp)));
+  } else J.neck.quaternion.identity();
+  const seg = (name, parentQ, a, b, rest = DOWN) => {
+    if (ok(a, b)) {
+      const tip = P[b].clone();
+      if (rest === FWD) tip.y = P[a].y + (tip.y - P[a].y) * 0.3;     // keep feet close to flat
+      const d = tip.sub(P[a]).normalize().applyQuaternion(parentQ.clone().invert());
+      if (rest.dot(d) < -0.9999) J[name].quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI);  // exactly opposite (arm straight up)
+      else J[name].quaternion.setFromUnitVectors(rest, d);
+    }
+    return parentQ.clone().multiply(J[name].quaternion);
+  };
+  const uaL = seg('upperArmL', chestQ, LM.shL, LM.elL); seg('foreArmL', uaL, LM.elL, LM.wrL);
+  const uaR = seg('upperArmR', chestQ, LM.shR, LM.elR); seg('foreArmR', uaR, LM.elR, LM.wrR);
+  const thL = seg('thighL', hipsQ, LM.hipL, LM.knL), snL = seg('shinL', thL, LM.knL, LM.anL); seg('footL', snL, LM.anL, LM.toeL, FWD);
+  const thR = seg('thighR', hipsQ, LM.hipR, LM.knR), snR = seg('shinR', thR, LM.knR, LM.anR); seg('footR', snR, LM.anR, LM.toeR, FWD);
+  plantFeet(mq);
+  return true;
+}
+function plantFeet(mq) {
+  // Drop or lift the hips so the lowest part of the body touches the floor.
+  mq.J.hips.position.y = REST_HIP_Y;
+  mq.root.updateMatrixWorld(true);
+  const b = new THREE.Box3().setFromObject(mq.root);
+  mq.J.hips.position.y -= b.min.y - mq.root.position.y;
+}
+function getPose(mq) { const q = {}; JOINTS.forEach(n => q[n] = mq.J[n].quaternion.toArray().map(v => +v.toFixed(5))); return { q, hy: +mq.J.hips.position.y.toFixed(4) }; }
+function setPose(mq, pose) {
+  if (!pose || !pose.q) return;
+  JOINTS.forEach(n => { if (pose.q[n]) mq.J[n].quaternion.fromArray(pose.q[n]); });
+  if (typeof pose.hy === 'number') mq.J.hips.position.y = pose.hy;
+}
+function castState(mq) { const p = mq.root.position; return { id: mq.id, x: p.x, y: p.y, z: p.z, yaw: mq.root.rotation.y, pose: getPose(mq) }; }
+function restoreCast(states) {
+  if (!Array.isArray(states)) return;
+  states.forEach(st => {
+    const mq = cast.find(c => c.id === st.id); if (!mq) return;
+    mq.root.position.set(st.x, st.y, st.z); mq.root.rotation.y = st.yaw || 0; setPose(mq, st.pose);
+  });
+  renderCast();
+}
+
+// --- pose from photo (MediaPipe Pose Landmarker, runs on the device) ---
+const MP = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21';
+const MODELS = ['models/pose_landmarker_full.task',
+  'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task'];
+let lmPromise = null, lastLms = null, camStream = null;
+function getLandmarker() {
+  if (lmPromise) return lmPromise;
+  lmPromise = (async () => {
+    const { FilesetResolver, PoseLandmarker } = await import(MP + '/vision_bundle.mjs');
+    const files = await FilesetResolver.forVisionTasks(MP + '/wasm');
+    let err;
+    for (const modelAssetPath of MODELS) for (const delegate of ['GPU', 'CPU']) {
+      try { return await PoseLandmarker.createFromOptions(files, { baseOptions: { modelAssetPath, delegate }, runningMode: 'IMAGE', numPoses: 1 }); }
+      catch (e) { err = e; }
+    }
+    throw err;
+  })();
+  lmPromise.catch(() => { lmPromise = null; });
+  return lmPromise;
+}
+const pmMsg = t => { $('pmMsg').textContent = t || ''; };
+function openPose() {
+  if (!castSel) return;
+  $('pmTitle').textContent = `Pose ${castSel.name} from a photo`;
+  $('pm').hidden = false; lastLms = null; $('pmApply').disabled = true;
+  const c = $('pmCanvas'), x = c.getContext('2d'); c.width = 640; c.height = 480; x.fillStyle = '#000'; x.fillRect(0, 0, 640, 480);
+  if (inClaude) { pmMsg('Pose from photo needs the GitHub version of Set Viewfinder. This Claude view blocks the camera and the pose model.'); return; }
+  pmMsg('Loading the pose model…');
+  getLandmarker().then(() => pmMsg('Take or choose a photo of someone acting out the moment.'))
+    .catch(() => pmMsg("Couldn't load the pose model. Check the internet connection, or add models/pose_landmarker_full.task to the site."));
+}
+function stopCam() {
+  if (camStream) camStream.getTracks().forEach(t => t.stop());
+  camStream = null; $('pmVideo').hidden = true; $('pmCanvas').hidden = false; $('pmSnap').hidden = true; $('pmCam').hidden = false;
+}
+function closePose() { stopCam(); $('pm').hidden = true; lastLms = null; const c = $('pmCanvas'); c.getContext('2d').clearRect(0, 0, c.width, c.height); }
+$('mqPose').onclick = openPose;
+$('pmClose').onclick = closePose;
+$('pmCam').onclick = async () => {
+  try {
+    camStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 } }, audio: false });
+    const v = $('pmVideo'); v.srcObject = camStream; await v.play();
+    v.hidden = false; $('pmCanvas').hidden = true; $('pmSnap').hidden = false; $('pmCam').hidden = true;
+    pmMsg('Frame the whole body, then tap Snap.');
+  } catch (e) { pmMsg("Couldn't open the camera. Allow camera access in the browser, or use Choose photo."); }
+};
+$('pmSnap').onclick = () => { const v = $('pmVideo'); const w = v.videoWidth, h = v.videoHeight; if (!w) return; detectFrom(v, w, h); stopCam(); };
+$('pmFile').onchange = e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  const url = URL.createObjectURL(f), img = new Image();
+  img.onload = () => { detectFrom(img, img.naturalWidth, img.naturalHeight); URL.revokeObjectURL(url); };
+  img.onerror = () => { pmMsg("Couldn't open that image."); URL.revokeObjectURL(url); };
+  img.src = url;
+};
+async function detectFrom(src, w, h) {
+  const c = $('pmCanvas'), k = Math.min(1, 1024 / Math.max(w, h));
+  c.width = Math.round(w * k); c.height = Math.round(h * k);
+  const x = c.getContext('2d'); x.drawImage(src, 0, 0, c.width, c.height);
+  lastLms = null; $('pmApply').disabled = true; pmMsg('Finding the pose…');
+  let lm; try { lm = await getLandmarker(); } catch (e) { pmMsg("Couldn't load the pose model."); return; }
+  const res = lm.detect(c);
+  if (!res.worldLandmarks || !res.worldLandmarks.length) { pmMsg('No person found. Try a photo with the whole body visible and good light.'); return; }
+  lastLms = res.worldLandmarks[0];
+  drawSkeleton(x, res.landmarks[0], c.width, c.height);
+  $('pmApply').disabled = false;
+  pmMsg('Found a pose. Tap Apply pose.');
+}
+const BONES = [[11, 12], [11, 13], [13, 15], [12, 14], [14, 16], [11, 23], [12, 24], [23, 24], [23, 25], [25, 27], [27, 31], [24, 26], [26, 28], [28, 32], [7, 8]];
+function drawSkeleton(x, pts, w, h) {
+  x.lineWidth = Math.max(2, w / 220); x.strokeStyle = '#f2b134'; x.fillStyle = '#fff';
+  BONES.forEach(([a, b]) => { x.beginPath(); x.moveTo(pts[a].x * w, pts[a].y * h); x.lineTo(pts[b].x * w, pts[b].y * h); x.stroke(); });
+  [0, 7, 8, 11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28, 31, 32].forEach(i => { x.beginPath(); x.arc(pts[i].x * w, pts[i].y * h, x.lineWidth * 1.4, 0, Math.PI * 2); x.fill(); });
+}
+$('pmApply').onclick = () => {
+  if (!castSel || !lastLms) return;
+  if (applyLandmarks(castSel, lastLms, $('pmMirror').checked)) { markDirty(true); closePose(); note(`${castSel.name} is posed. Frame the shot and Capture.`, 3500); }
+  else pmMsg("Couldn't see the shoulders and hips clearly. Try another photo.");
+};
+renderCast();
+window.VF = { addMannequin, applyLandmarks, getPose, setPose, castState, get cast() { return cast; }, rig, cam, frameShot, subjectInfo, get subjects() { return subjects; } };
+
 // ---------- capture (frames live in memory until saved) ----------
 let shots = [], dirty = false, setGlb = null, setLabel = 'Sample diner';
 function markDirty(v) {
@@ -928,6 +1261,7 @@ function gotoShot(i) {
   Object.assign(rig, { x: shot.x, y: shot.y, z: shot.z, lens: shot.lens });
   if (shot.fstop) { fstop = shot.fstop; syncStops(); }
   hIn.value = shot.y; syncLens(); setLook(shot.yaw, shot.pitch); clearPreset();
+  restoreCast(shot.cast);
 }
 function deleteShot(i) {
   shots.splice(i, 1); renderStrip(); markDirty(true);
@@ -939,7 +1273,7 @@ $('capture').onclick = () => {
   const dpr = renderer.getPixelRatio();
   c.getContext('2d').drawImage(canvas, (W - fw) / 2 * dpr, (H - fh) / 2 * dpr, fw * dpr, fh * dpr, 0, 0, 640, 360);
   const d = currentDir();
-  shots.push({ url: c.toDataURL('image/jpeg', 0.82), title: '', label: lastShot, note: '', x: rig.x, y: rig.y, z: rig.z, lens: rig.lens, fstop,
+  shots.push({ url: c.toDataURL('image/jpeg', 0.82), title: '', label: lastShot, note: '', cast: cast.map(castState), x: rig.x, y: rig.y, z: rig.z, lens: rig.lens, fstop,
                yaw: Math.atan2(-d.x, -d.z), pitch: Math.asin(THREE.MathUtils.clamp(d.y, -1, 1)) });
   renderStrip(); markDirty(true);
   const last = $('strip').lastElementChild; if (last) last.scrollIntoView({ inline: 'end', block: 'nearest' });
@@ -984,8 +1318,9 @@ $('save').onclick = async () => {
     app: 'set-viewfinder', version: 1, savedAt: new Date().toISOString(),
     set: { name: setLabel, glb: setGlb ? bufToB64(setGlb) : null },
     camera: { x: rig.x, y: rig.y, z: rig.z, lens: rig.lens, fstop, yaw: currentYaw(), pitch: Math.asin(THREE.MathUtils.clamp(currentDir().y, -1, 1)) },
-    subjects: subjects.map(s => ({ name: s.name, node: s.obj.name })),
-    shots: shots.map(({ url, title, label, note, x, y, z, lens, fstop, yaw, pitch }) => ({ url, title: title || '', label, note, x, y, z, lens, fstop, yaw, pitch }))
+    subjects: subjects.filter(s => !s.mq).map(s => ({ name: s.name, node: s.obj.name })),
+    cast: cast.map(c => ({ ...castState(c), name: c.name, color: c.color })),
+    shots: shots.map(({ url, title, label, note, x, y, z, lens, fstop, yaw, pitch, cast }) => ({ url, title: title || '', label, note, x, y, z, lens, fstop, yaw, pitch, cast: cast || [] }))
   };
   const blob = new Blob([JSON.stringify(project)], { type: 'application/json' });
   if (await offerFile(`${slug(setLabel)}-${stamp()}.json`, blob)) {
@@ -1013,6 +1348,10 @@ function openProject(file) {
         });
         renderSubs(); buildFootprints();
       }
+      if (Array.isArray(p.cast)) p.cast.forEach(c => {
+        const mq = addMannequin(new THREE.Vector3(c.x, c.y, c.z), c.yaw || 0, { id: c.id, name: c.name, color: c.color });
+        setPose(mq, c.pose);
+      });
       const c = p.camera;
       if (c) {
         Object.assign(rig, { x: c.x, y: c.y, z: c.z, lens: c.lens || rig.lens });
@@ -1172,6 +1511,7 @@ $('bvLoupe').onclick = () => setMode('loupe');
 $('bvImages').onclick = downloadImages;
 $('bvExport').onclick = exportBoard;
 addEventListener('keydown', e => {
+  if (!$('pm').hidden && e.key === 'Escape') { closePose(); return; }
   if ($('bv').hidden || /INPUT|TEXTAREA/.test(e.target.tagName)) return;
   if (e.key === 'Escape') { if (boardMode === 'loupe') setMode('grid'); else closeBoard(); }
   else if (boardMode === 'loupe' && e.key === 'ArrowLeft') step(-1);
@@ -1216,3 +1556,6 @@ layout();
 requestAnimationFrame(frame);
 })();
 </script>
+
+</body>
+</html>

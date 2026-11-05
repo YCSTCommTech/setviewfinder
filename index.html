@@ -125,6 +125,48 @@ button,label.btn{cursor:pointer}
 .datamenu .all{grid-column:1/-1;display:flex;gap:6px;padding-top:4px;border-top:1px solid var(--line);margin-top:2px}
 .reads.none::before{content:"All camera data is hidden. Use Data to choose what to show.";font-size:12px;color:var(--dim);grid-column:1/-1}
 .focusrow{display:flex;align-items:center;gap:6px}
+.tabs{display:grid !important;grid-template-columns:repeat(4,minmax(0,1fr))}
+.tabs button{flex:none !important}
+.frame .cross{position:absolute;left:50%;top:50%;width:22px;height:22px;transform:translate(-50%,-50%);background:linear-gradient(rgba(255,255,255,.6),rgba(255,255,255,.6)) center/1px 100% no-repeat,linear-gradient(rgba(255,255,255,.6),rgba(255,255,255,.6)) center/100% 1px no-repeat}
+.frame .safe{position:absolute;border:1px dashed rgba(255,255,255,.35)}
+.frame .safe.act{inset:5%}.frame .safe.ttl{inset:10%}
+.frame:not(.g-thirds) .third,.frame:not(.g-cross) .cross,.frame:not(.g-safe) .safe{display:none}
+.viewseg{position:absolute;right:calc(10px + env(safe-area-inset-right,0px));top:8px;display:inline-flex;border:1px solid rgba(255,255,255,.25);border-radius:6px;overflow:hidden;background:rgba(10,10,12,.55)}
+.viewseg button{background:none;border:0;padding:5px 10px;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.7)}
+.viewseg button+button{border-left:1px solid rgba(255,255,255,.2)}
+.viewseg button[aria-pressed="true"]{color:#fff;background:rgba(242,177,52,.35)}
+.stage.witness .frame,.stage.witness .slate{display:none}
+.wlabel{position:absolute;left:10px;top:10px;font-family:var(--f-mono);font-size:11px;color:#fff;text-shadow:0 1px 2px #000;pointer-events:none}
+.sel{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:7px 8px;font-size:13px;min-width:0}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.pad{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
+.pad button{background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:8px 4px;font-size:12px;font-weight:600;letter-spacing:.04em;touch-action:none;-webkit-user-select:none;user-select:none}
+.pad button:active,.pad button.on{background:var(--accent);color:#1a1206;border-color:var(--accent)}
+.lgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+.lgrid .ro .v{font-size:11.5px}
+.presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+.presets button{background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:6px 4px;font-size:12px;font-weight:600;text-align:center}
+.presets button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:#2a2216}
+.lcard{border:1px solid var(--line);border-radius:6px;background:var(--panel);padding:7px 8px;display:flex;flex-direction:column;gap:4px}
+.lcard header{display:flex;align-items:center;gap:8px}
+.lcard header b{flex:1;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.lcard .sw{width:14px;height:14px;border-radius:50%;border:1px solid rgba(255,255,255,.3)}
+.lcard.off .slider{opacity:.4}
+.lcard .slider span{min-width:58px}
+.ratio{font-family:var(--f-mono);font-size:12px;color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:6px 8px}
+.pad2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
+.pad2 .pr{display:grid;grid-template-columns:auto 1fr auto;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:5px;overflow:hidden}
+.pad2 .pr span{text-align:center;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.pad2 .pr button{background:var(--raise);border:0;padding:7px 9px;font-size:12px;min-width:38px;touch-action:none;-webkit-user-select:none;user-select:none}
+.pad2 .pr button.on,.pad2 .pr button:active{background:var(--accent);color:#1a1206}
+.lsets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+.lsets button{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:7px 8px;text-align:left}
+.lsets button b{display:block;font-size:13px}
+.lsets button small{display:block;color:var(--muted);font-size:11px;line-height:1.3}
+.lsets button[aria-pressed="true"]{border-color:var(--accent);background:#2a2216}
+.lcard .lux{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.lcard select{flex:1;min-width:0}
+.kbar{height:6px;border-radius:3px;background:linear-gradient(90deg,#ff8a2a,#ffc779,#fff1de,#e8f0ff,#a9c7ff)}
 .focusrow .slider{flex:1}
 .btn.save{flex:none;border-color:var(--line)}
 .btn.save.dirty{border-color:var(--accent);color:var(--accent)}
@@ -212,7 +254,7 @@ details ol{margin:6px 0 0;padding-left:18px;line-height:1.5}
   <header class="top">
     <div class="brand">
       <h1>Set Viewfinder</h1>
-      <span class="credit"><span class="ver">v0.8</span>Based on <b>Backlot Stage</b> by David Gran · this version adds features by Mr. P</span>
+      <span class="credit"><span class="ver">v0.9</span>Based on <b>Backlot Stage</b> by David Gran · this version adds features by Mr. P</span>
     </div>
     <span class="set" id="setName">Set: <b>Sample diner</b></span>
     <label class="btn load" for="file" title="Open a Blender set (.glb) or a saved project (.json)">Open</label>
@@ -223,12 +265,21 @@ details ol{margin:6px 0 0;padding-left:18px;line-height:1.5}
 
   <section class="stage" id="stage" aria-label="Camera view of the set">
     <canvas id="gl"></canvas>
-    <div class="frame" id="frame">
+    <div class="frame g-thirds" id="frame">
       <div class="third" style="left:33.33%;top:0;bottom:0;width:1px"></div>
       <div class="third" style="left:66.66%;top:0;bottom:0;width:1px"></div>
       <div class="third" style="top:33.33%;left:0;right:0;height:1px"></div>
       <div class="third" style="top:66.66%;left:0;right:0;height:1px"></div>
+      <div class="cross"></div>
+      <div class="safe act"></div><div class="safe ttl"></div>
       <div class="slate" id="slate"></div>
+    </div>
+    <div class="wlabel" id="wlabel" hidden>WITNESS VIEW · drag to orbit, scroll to zoom</div>
+    <div class="viewseg" role="group" aria-label="Monitor view">
+      <button id="vCam" aria-pressed="true" title="What the camera sees">Camera</button><button id="vWit" aria-pressed="false" title="Look at the whole set, with the camera and lights">Witness</button>
+    </div>
+    <div class="viewseg" role="group" aria-label="Units" style="top:40px">
+      <button id="uM" aria-pressed="true">M</button><button id="uFt" aria-pressed="false">FT</button>
     </div>
     <div class="note" id="note" hidden></div>
     <div class="stick" id="stick" aria-label="Walk joystick"><b id="knob"></b><span>Walk</span></div>
@@ -264,27 +315,133 @@ details ol{margin:6px 0 0;padding-left:18px;line-height:1.5}
     </div>
 
     <div class="tabs" role="tablist">
-      <button role="tab" id="t-frame" aria-controls="p-frame" aria-selected="true">Frame</button>
+      <button role="tab" id="t-camera" aria-controls="p-camera" aria-selected="true">Camera</button>
+      <button role="tab" id="t-lens" aria-controls="p-lens" aria-selected="false">Lens</button>
+      <button role="tab" id="t-light" aria-controls="p-light" aria-selected="false">Light</button>
+      <button role="tab" id="t-image" aria-controls="p-image" aria-selected="false">Image</button>
       <button role="tab" id="t-plan" aria-controls="p-plan" aria-selected="false">Plan</button>
       <button role="tab" id="t-subj" aria-controls="p-subj" aria-selected="false">Subjects</button>
       <button role="tab" id="t-set" aria-controls="p-set" aria-selected="false">Set</button>
     </div>
 
-    <div class="pane" id="p-frame" role="tabpanel">
-      <span class="lbl">Lens</span>
-      <div class="row"><div class="chips" id="lenses" role="group" aria-label="Lens"></div></div>
-      <span class="lbl">Aperture: lower f-number, more background blur</span>
-      <div class="chips" id="stops" style="grid-template-columns:repeat(4,minmax(0,1fr))"></div>
-      <div class="focusrow">
-        <label class="slider" for="focus"><span>Focus</span><input id="focus" type="range" min="0" max="1000" step="1" value="400"><output id="focusv">—</output></label>
-        <button class="mini" id="af" aria-pressed="true" title="Keep focus on the subject's eyes, or the centre of frame">Auto</button>
-      </div>
-      <label class="tog" for="blur"><input type="checkbox" id="blur" checked> Show lens blur (depth of field)</label>
-      <span class="lbl">Shot size: moves the camera to frame the subject</span>
+    <div class="pane" id="p-camera" role="tabpanel">
+      <span class="lbl">Frame the shot</span>
+      <p class="hint">Shot sizes move the camera toward or away from the subject. Angles swing it up or down around them.</p>
+      <div class="focusrow"><span class="lbl" style="flex:none">Subject</span><div class="seg" id="subjSeg" style="flex:1"></div></div>
+      <span class="lbl">Shot size</span>
       <div class="sizes" id="sizes"></div>
-      <span class="lbl">Camera height</span>
-      <div class="seg" id="heights"></div>
-      <label class="slider" for="h"><span>Lens height</span><input id="h" type="range" min="0.1" max="3" step="0.01" value="1.6"><output id="hv">1.60 m</output></label>
+      <span class="lbl">Angle</span>
+      <div class="sizes" id="angles"></div>
+      <span class="lbl">Move the camera</span>
+      <p class="hint">Hold a button. The monitor also takes a drag (pan and tilt). Keys: arrows pan/tilt · W/S dolly · A/D truck · Q/E pedestal · Z/X zoom · space plays the move.</p>
+      <div class="pad2" id="pad"></div>
+      <div class="seg" id="speeds"></div>
+      <span class="lbl">Position</span>
+      <label class="slider" for="posX"><span>Left / right</span><input id="posX" type="range" min="-10" max="10" step="0.01" value="0"><output id="posXv"></output></label>
+      <label class="slider" for="posZ"><span>Front / back</span><input id="posZ" type="range" min="-10" max="10" step="0.01" value="0"><output id="posZv"></output></label>
+      <label class="slider" for="h"><span>Height</span><input id="h" type="range" min="0.1" max="3" step="0.01" value="1.6"><output id="hv">1.60 m</output></label>
+      <label class="slider" for="panS"><span>Pan</span><input id="panS" type="range" min="0" max="359" step="1" value="0"><output id="panSv">0°</output></label>
+      <label class="slider" for="tiltS"><span>Tilt</span><input id="tiltS" type="range" min="-89" max="89" step="1" value="0"><output id="tiltSv">0°</output></label>
+      <label class="slider" for="dutch"><span>Dutch angle</span><input id="dutch" type="range" min="-45" max="45" step="1" value="0"><output id="dutchv">0°</output></label>
+      <div class="row" id="eyelines"></div>
+      <span class="lbl">Camera move</span>
+      <p class="hint">Frame the opening, press Set start. Frame the ending, press Set end. Play runs the move.</p>
+      <div class="row">
+        <button class="btn" id="mvStart">Set start</button><button class="btn" id="mvEnd">Set end</button><button class="btn" id="mvClear">Clear move</button>
+      </div>
+      <label class="slider" for="mvLen"><span>Move length</span><input id="mvLen" type="range" min="1" max="20" step="0.5" value="4"><output id="mvLenv">4.0 s</output></label>
+      <div class="row"><button class="btn load" id="mvPlay">Play move</button><span class="hint" id="mvState" style="flex:1">No camera move set.</span></div>
+      <span class="lbl">Lighting rig</span>
+      <label class="tog" for="showLamps"><input type="checkbox" id="showLamps"> Show lamps and stands in the shot</label>
+    </div>
+
+    <div class="pane" id="p-lens" role="tabpanel" hidden>
+      <span class="lbl">Sensor &amp; frame</span>
+      <label class="slider" for="sensor" style="display:flex"><span>Sensor</span><select class="sel" id="sensor"></select></label>
+      <div class="focusrow"><span class="lbl" style="flex:none;min-width:72px">Aspect ratio</span><div class="seg" id="aspects" style="flex:1"></div></div>
+      <p class="hint">A smaller sensor sees a narrower view through the same lens and gives deeper focus at the same framing.</p>
+      <span class="lbl">Focal length</span>
+      <div class="row"><div class="chips" id="lenses" role="group" aria-label="Lens" style="grid-template-columns:repeat(7,minmax(0,1fr))"></div></div>
+      <label class="slider" for="zoom"><span>Zoom</span><input id="zoom" type="range" min="0" max="1000" step="1" value="400"><output id="zoomv">35 mm</output></label>
+      <label class="tog" for="dolly"><input type="checkbox" id="dolly"> Dolly zoom: keep the subject the same size when changing lens</label>
+      <p class="hint">Compare a zoom with a dolly on the same subject: zooming flattens space, dollying changes perspective.</p>
+      <span class="lbl">Aperture &amp; focus</span>
+      <label class="slider" for="apS"><span>Aperture</span><input id="apS" type="range" min="0" max="18" step="1" value="9"><output id="apSv">f/4</output></label>
+      <div class="chips" id="stops" style="grid-template-columns:repeat(4,minmax(0,1fr))"></div>
+      <label class="slider" for="focusOn" style="display:flex"><span>Focus on</span><select class="sel" id="focusOn"></select></label>
+      <div class="focusrow">
+        <label class="slider" for="focus"><span>Distance</span><input id="focus" type="range" min="0" max="1000" step="1" value="400"><output id="focusv">—</output></label>
+        <button class="mini" id="af" aria-pressed="true" title="Auto focus on the subject nearest the centre of frame">Auto</button>
+      </div>
+      <div class="row" id="racks"></div>
+      <label class="slider" for="rackT"><span>Rack speed</span><input id="rackT" type="range" min="0.2" max="5" step="0.1" value="1.6"><output id="rackTv">1.6 s</output></label>
+      <label class="tog" for="blur"><input type="checkbox" id="blur" checked> Show lens blur (depth of field)</label>
+      <span class="lbl">Depth of field</span>
+      <div class="lgrid">
+        <div class="ro"><span class="k">Near limit</span><span class="v" id="lNear">—</span></div>
+        <div class="ro"><span class="k">Far limit</span><span class="v" id="lFar">—</span></div>
+        <div class="ro"><span class="k">Total depth</span><span class="v" id="lTot">—</span></div>
+        <div class="ro"><span class="k">Hyperfocal</span><span class="v" id="lHyp">—</span></div>
+        <div class="ro"><span class="k">Field of view</span><span class="v" id="lH">—</span></div>
+        <div class="ro"><span class="k">Full-frame eq.</span><span class="v" id="lEq">—</span></div>
+      </div>
+      <p class="hint">Calculated from focal length, aperture, focus distance and sensor size. The blur on screen is drawn from the same numbers. In Witness view the camera shows the focus plane and the near and far limits.</p>
+    </div>
+
+    <div class="pane" id="p-light" role="tabpanel" hidden>
+      <span class="lbl">Lighting setups</span>
+      <div class="lsets" id="lpresets"></div>
+      <div class="ratio" id="ratio">Key : fill —</div>
+      <div id="lcards" class="pane" style="padding:0"></div>
+      <p class="hint">Drag the K, F and B dots on the Plan tab to move lamps. Softer light comes from a bigger source: watch the highlights and the shadow edges.</p>
+      <div class="lcard" id="winCard">
+        <header><b>Window daylight</b><label class="tog" for="winOn" style="flex:none"><input type="checkbox" id="winOn" checked> On</label></header>
+        <label class="slider" for="sun"><span>Sun</span><input id="sun" type="range" min="0" max="1.5" step="0.01" value="1"><output id="sunv"></output></label>
+        <label class="slider" for="sky"><span>Sky fill</span><input id="sky" type="range" min="0" max="1.5" step="0.01" value="1"><output id="skyv"></output></label>
+        <label class="slider" for="sunK"><span>Colour temp</span><input id="sunK" type="range" min="2000" max="12000" step="100" value="5600"><output id="sunKv"></output></label>
+        <label class="slider" for="ovc"><span>Clear ↔ overcast</span><input id="ovc" type="range" min="0" max="1" step="0.01" value="0.2"><output id="ovcv"></output></label>
+        <label class="slider" for="sunDir"><span>Sun direction</span><input id="sunDir" type="range" min="-180" max="180" step="1" value="40"><output id="sunDirv"></output></label>
+        <label class="slider" for="sunH"><span>Sun height</span><input id="sunH" type="range" min="2" max="88" step="1" value="40"><output id="sunHv"></output></label>
+      </div>
+      <div class="lcard" id="pracCard">
+        <header><b>Practicals (set lamps)</b><label class="tog" for="pracOn" style="flex:none"><input type="checkbox" id="pracOn" checked> On</label></header>
+        <label class="slider" for="pracDim"><span>Dimmer</span><input id="pracDim" type="range" min="0" max="2" step="0.01" value="1"><output id="pracDimv"></output></label>
+        <label class="slider" for="pracK"><span>Colour temp</span><input id="pracK" type="range" min="1800" max="6500" step="100" value="2800"><output id="pracKv"></output></label>
+      </div>
+      <div class="lcard" id="ambCard">
+        <header><b>Bounce &amp; ambient</b></header>
+        <p class="hint">Light bouncing around the room. Keep it low to see each lamp's effect clearly.</p>
+        <label class="slider" for="amb"><span>Level</span><input id="amb" type="range" min="0" max="60" step="1" value="10"><output id="ambv"></output></label>
+        <label class="slider" for="ambK"><span>Colour temp</span><input id="ambK" type="range" min="2000" max="12000" step="100" value="5600"><output id="ambKv"></output></label>
+      </div>
+    </div>
+
+    <div class="pane" id="p-image" role="tabpanel" hidden>
+      <span class="lbl">Exposure</span>
+      <label class="slider" for="expo"><span>Exposure</span><input id="expo" type="range" min="-3" max="3" step="0.1" value="0"><output id="expov">0.0 EV</output></label>
+      <label class="slider" for="nd"><span>ND filter</span><input id="nd" type="range" min="0" max="6" step="1" value="0"><output id="ndv">None</output></label>
+      <label class="tog" for="apExp"><input type="checkbox" id="apExp" checked> Aperture changes exposure, as on a real camera</label>
+      <p class="hint">Opening from f/4 to f/2 lets in 4× the light. Add 2 stops of ND to keep the exposure while keeping the shallow focus.</p>
+      <span class="lbl">White balance</span>
+      <p class="hint">Set it to match the main light. Lights warmer than the setting look orange; cooler ones look blue.</p>
+      <label class="slider" for="wb"><span>Camera WB</span><input id="wb" type="range" min="2500" max="10000" step="50" value="5600"><output id="wbv">5600 K</output></label>
+      <div class="row" id="wbPresets"></div>
+      <span class="lbl">Monitor tools</span>
+      <div class="seg"><button class="chip" id="mNormal" aria-pressed="true">Normal</button><button class="chip" id="mFalse" aria-pressed="false">False colour</button></div>
+      <p class="hint">False colour: <b style="color:#b07cff">purple</b> crushed, <b style="color:#5b8cff">blue</b> deep shadow, <b style="color:#4fd16b">green</b> mid-grey, <b style="color:#ff8fd0">pink</b> skin about one stop over, <b style="color:#ffe14d">yellow</b> near clipping, <b style="color:#ff5a4d">red</b> clipped.</p>
+      <label class="tog" for="peak"><input type="checkbox" id="peak"> Focus peaking (marks what is sharp)</label>
+      <label class="tog" for="gThirds"><input type="checkbox" id="gThirds" checked> Rule-of-thirds guides</label>
+      <label class="tog" for="gCross"><input type="checkbox" id="gCross"> Centre mark</label>
+      <label class="tog" for="gSafe"><input type="checkbox" id="gSafe"> Safe areas</label>
+      <span class="lbl">Look (Set Viewfinder extra)</span>
+      <div class="presets" id="looks"></div>
+      <label class="slider" for="con"><span>Contrast</span><input id="con" type="range" min="0.5" max="1.6" step="0.01" value="1"><output id="conv">100%</output></label>
+      <label class="slider" for="sat"><span>Saturation</span><input id="sat" type="range" min="0" max="1.8" step="0.01" value="1"><output id="satv">100%</output></label>
+      <label class="slider" for="vig"><span>Vignette</span><input id="vig" type="range" min="0" max="1" step="0.01" value="0"><output id="vigv">0%</output></label>
+      <label class="slider" for="grain"><span>Film grain</span><input id="grain" type="range" min="0" max="0.25" step="0.005" value="0"><output id="grainv">0%</output></label>
+      <span class="lbl">Performance</span>
+      <p class="hint">Lower this on slow laptops and Chromebooks. Low turns off shadows and lowers resolution and focus-blur quality.</p>
+      <div class="seg" id="perf"><button class="chip" data-q="low">Low</button><button class="chip" data-q="medium" aria-pressed="true">Medium</button><button class="chip" data-q="high">High</button></div>
     </div>
 
     <div class="pane" id="p-plan" role="tabpanel" hidden>
@@ -294,6 +451,7 @@ details ol{margin:6px 0 0;padding-left:18px;line-height:1.5}
         <span><i style="background:#cfd6df"></i>Subjects (tick shows facing)</span>
         <span><i style="background:#3a3d44"></i>Set pieces</span>
         <span><i style="background:#6fd3ff"></i>Focus line and sharp zone</span>
+        <span><i style="background:#fff1de"></i>Lamps K, F, B (drag to move)</span>
       </div>
       <p class="hint">Drag the blue focus line to pull focus. Tap or drag anywhere else to move the camera. The back of the set is at the top; grid squares are 1 m.</p>
     </div>
@@ -326,10 +484,7 @@ details ol{margin:6px 0 0;padding-left:18px;line-height:1.5}
     </div>
 
     <div class="pane" id="p-set" role="tabpanel" hidden>
-      <label class="slider" for="work"><span>Work light</span><input id="work" type="range" min="0" max="2" step="0.01" value="1"><output id="workv">100%</output></label>
-      <label class="slider" for="lights"><span>Set lights</span><input id="lights" type="range" min="0" max="3" step="0.01" value="1"><output id="lightsv">100%</output></label>
       <label class="slider" for="smooth"><span>Motion smoothing</span><input id="smooth" type="range" min="0" max="0.95" step="0.05" value="0.6"><output id="smoothv">60%</output></label>
-      <label class="slider" for="expo"><span>Exposure</span><input id="expo" type="range" min="-3" max="3" step="0.1" value="0"><output id="expov">0.0 EV</output></label>
       <details>
         <summary>Exporting a set from Blender</summary>
         <ol>
@@ -520,7 +675,7 @@ function useSet(root, label, cameras) {
   });
   bounds = new THREE.Box3().setFromObject(root);
   if (bounds.isEmpty()) bounds.set(new THREE.Vector3(-5, 0, -5), new THREE.Vector3(5, 3, 5));
-  aimWorkLight(bounds);
+  aimWorkLight(bounds); applyEnv();
   $('setName').innerHTML = '';
   $('setName').append('Set: ');
   const b = document.createElement('b'); b.textContent = label; $('setName').append(b);
@@ -587,11 +742,11 @@ addEventListener('dragover', e => e.preventDefault());
 addEventListener('drop', e => { e.preventDefault(); dragDepth = 0; $('drop').hidden = true; loadFile(e.dataTransfer.files[0]); });
 
 // ---------- camera rig ----------
-const LENSES = [18, 24, 35, 50, 85, 135];
-const SENSOR_H = 36 * 9 / 16;
+const LENSES = [14, 18, 24, 35, 50, 85, 135];
+let SENSOR_W = 36, ASPECT = 16 / 9, SENSOR_H = SENSOR_W / ASPECT;
 const SHOTS = [['ECU', .08], ['CU', .19], ['MCU', .32], ['MS', .50], ['MWS', .68], ['FS', 1.2], ['WS', 2.2], ['EWS', 5.0]];
 const ZONES = [[0.45, 'Intimate', '--z-int', 0xe05c50], [1.2, 'Personal', '--z-per', 0xe6b84a], [3.6, 'Social', '--z-soc', 0x4fb3a5], [7.6, 'Public', '--z-pub', 0x7a8fc2]];
-const rig = { x: 1.9, z: 2.2, y: 1.6, yaw: 0.35, pitch: -0.05, lens: 35 };
+const rig = { x: 1.9, z: 2.2, y: 1.6, yaw: 0.35, pitch: -0.05, roll: 0, lens: 35 };
 let gyro = false, gotGyro = false, yawOffset = 0;
 const devQ = new THREE.Quaternion();
 
@@ -599,10 +754,14 @@ const lensBox = $('lenses');
 LENSES.forEach(mm => {
   const b = document.createElement('button'); b.className = 'chip'; b.textContent = mm;
   b.setAttribute('aria-label', mm + ' millimetre lens');
-  b.onclick = () => { rig.lens = mm; syncLens(); };
+  b.onclick = () => setLens(mm);
   lensBox.appendChild(b);
 });
-function syncLens() { [...lensBox.children].forEach((b, i) => b.setAttribute('aria-pressed', LENSES[i] === rig.lens)); layout(); }
+function syncLens() {
+  [...lensBox.children].forEach((b, i) => b.setAttribute('aria-pressed', LENSES[i] === rig.lens));
+  if (document.activeElement !== $('zoom')) $('zoom').value = zoomToSlider(rig.lens);
+  $('zoomv').textContent = rig.lens + ' mm'; layout();
+}
 const hIn = $('h');
 function syncHeight() {
   hIn.min = (bounds.min.y + 0.1).toFixed(2); hIn.max = (Math.max(bounds.max.y, bounds.min.y + 3)).toFixed(2);
@@ -615,14 +774,526 @@ function layout() {
   const r = stage.getBoundingClientRect();
   W = Math.max(1, r.width); H = Math.max(1, r.height);
   renderer.setSize(W, H, false);
-  fw = Math.min(W * 0.92, H * 0.92 * 16 / 9); fh = fw * 9 / 16;
+  fw = Math.min(W * 0.92, H * 0.92 * ASPECT); fh = fw / ASPECT;
   const fr = $('frame').style;
   fr.width = fw + 'px'; fr.height = fh + 'px'; fr.left = (W - fw) / 2 + 'px'; fr.top = (H - fh) / 2 + 'px';
   const vFrame = 2 * Math.atan(SENSOR_H / 2 / rig.lens);
   cam.fov = THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(vFrame / 2) * H / fh));
   cam.aspect = W / H; cam.updateProjectionMatrix();
+  wcam.aspect = W / H; wcam.updateProjectionMatrix();
 }
 new ResizeObserver(layout).observe(stage);
+
+// ======================= Camera / Lens / Light / Image tabs (after David Gran's Backlot Stage) =======================
+// ---------- sensor & aspect ----------
+const SENSORS = [['Full frame', 36, 24], ['Super 35', 24.89, 14], ['APS-C', 23.5, 15.6], ['Micro Four Thirds', 17.3, 13], ['1-inch', 13.2, 8.8], ['Phone main camera', 9.8, 7.3]];
+const ASPECTS = [['1.33', 4 / 3], ['1.78', 16 / 9], ['1.85', 1.85], ['2.39', 2.39], ['9:16', 9 / 16]];
+SENSORS.forEach(([t, w, h], i) => { const o = document.createElement('option'); o.value = i; o.textContent = `${t} · ${w}×${h} mm`; $('sensor').append(o); });
+ASPECTS.forEach(([t, a]) => { const b = document.createElement('button'); b.className = 'chip'; b.textContent = t; b.onclick = () => setFormat(SENSOR_W, a); $('aspects').append(b); });
+function setFormat(sensorW, aspect) {
+  SENSOR_W = sensorW; ASPECT = aspect; SENSOR_H = SENSOR_W / ASPECT;
+  COC = Math.hypot(SENSOR_W, SENSOR_H) / 1443;
+  $('sensor').value = Math.max(0, SENSORS.findIndex(x => Math.abs(x[1] - SENSOR_W) < 0.05));
+  [...$('aspects').children].forEach((b, i) => b.setAttribute('aria-pressed', Math.abs(ASPECTS[i][1] - ASPECT) < 0.01));
+  layout();
+}
+$('sensor').onchange = e => setFormat(SENSORS[+e.target.value][1], ASPECT);
+
+// ---------- guides (Image tab) ----------
+[['gThirds', 'g-thirds'], ['gCross', 'g-cross'], ['gSafe', 'g-safe']].forEach(([id, cls]) => $(id).onchange = e => $('frame').classList.toggle(cls, e.target.checked));
+
+// ---------- units ----------
+let units = 'm';
+function setUnits(u) {
+  units = u; $('uM').setAttribute('aria-pressed', u === 'm'); $('uFt').setAttribute('aria-pressed', u === 'ft');
+  try { localStorage.setItem('vf-units', u); } catch (e) {}
+  if (typeof renderLightCards === 'function' && $('lcards').children.length) renderLightCards(false);
+}
+$('uM').onclick = () => setUnits('m'); $('uFt').onclick = () => setUnits('ft');
+try { if (localStorage.getItem('vf-units') === 'ft') setUnits('ft'); } catch (e) {}
+
+// ---------- subject picker ----------
+let selSubj = null;
+function framedSubject() { return (selSubj && subjects.includes(selSubj)) ? selSubj : (current || nearestSubject()); }
+function renderSubjSeg() {
+  const box = $('subjSeg'); box.textContent = '';
+  if (!subjects.length) { const s = document.createElement('span'); s.className = 'hint'; s.textContent = 'No subjects yet (Subjects tab)'; box.append(s); }
+  subjects.forEach(s => {
+    const b = document.createElement('button'); b.className = 'chip'; b.textContent = s.name;
+    b.setAttribute('aria-pressed', s === selSubj); b.onclick = () => { selSubj = s; renderSubjSeg(); renderFocusOptions(); };
+    box.append(b);
+  });
+}
+
+// ---------- hold-to-move pad + keys ----------
+const PAD = [['panL', '◀', 'Pan', 'panR', '▶'], ['tiltD', '▼', 'Tilt', 'tiltU', '▲'], ['pull', 'out', 'Dolly', 'push', 'in'], ['truckL', '◀', 'Truck', 'truckR', '▶'],
+             ['pedD', 'down', 'Pedestal', 'pedU', 'up'], ['arcL', '◀', 'Arc', 'arcR', '▶'], ['zoomOut', 'wide', 'Zoom', 'zoomIn', 'tight'], ['dutchL', '↺', 'Dutch', 'dutchR', '↻']];
+const held = new Set();
+PAD.forEach(([a, al, name, b, bl]) => {
+  const row = document.createElement('div'); row.className = 'pr';
+  const mk = (mv, label) => {
+    const btn = document.createElement('button'); btn.textContent = label; btn.setAttribute('aria-label', `${name} ${label}`);
+    const on = e => { e.preventDefault(); held.add(mv); btn.classList.add('on'); btn.setPointerCapture?.(e.pointerId); clearPreset(); };
+    const off = () => { held.delete(mv); btn.classList.remove('on'); };
+    btn.addEventListener('pointerdown', on); btn.addEventListener('pointerup', off); btn.addEventListener('pointercancel', off); btn.addEventListener('lostpointercapture', off);
+    return btn;
+  };
+  const sp = document.createElement('span'); sp.textContent = name;
+  row.append(mk(a, al), sp, mk(b, bl)); $('pad').append(row);
+});
+const SPEEDS = [['Slow', 0.3, 8], ['Medium', 0.8, 20], ['Fast', 1.6, 45]];
+let speed = SPEEDS[1];
+SPEEDS.forEach(sp => {
+  const b = document.createElement('button'); b.className = 'chip'; b.textContent = sp[0];
+  b.onclick = () => { speed = sp; [...$('speeds').children].forEach(c => c.setAttribute('aria-pressed', c === b)); };
+  b.setAttribute('aria-pressed', sp === speed); $('speeds').append(b);
+});
+const KEYMV = { arrowleft: 'panL', arrowright: 'panR', arrowup: 'tiltU', arrowdown: 'tiltD', z: 'zoomOut', x: 'zoomIn' };
+function applyHeldMoves(dt) {
+  const mv = new Set(held);
+  for (const k in KEYMV) if (keys[k]) mv.add(KEYMV[k]);
+  if (!mv.size) return;
+  const d = currentDir(), fwdH = new THREE.Vector3(d.x, 0, d.z).normalize(), right = new THREE.Vector3(-fwdH.z, 0, fwdH.x);
+  const m = speed[1] * dt, a = THREE.MathUtils.degToRad(speed[2]) * dt;
+  const move = v => { rig.x += v.x; rig.z += v.z; };
+  if (mv.has('push')) move(fwdH.clone().multiplyScalar(m));
+  if (mv.has('pull')) move(fwdH.clone().multiplyScalar(-m));
+  if (mv.has('truckL')) move(right.clone().multiplyScalar(-m));
+  if (mv.has('truckR')) move(right.clone().multiplyScalar(m));
+  if (mv.has('pedU')) rig.y = Math.min(+hIn.max, rig.y + m);
+  if (mv.has('pedD')) rig.y = Math.max(+hIn.min, rig.y - m);
+  if (mv.has('panL')) { if (gyro) yawOffset += a; else rig.yaw += a; }
+  if (mv.has('panR')) { if (gyro) yawOffset -= a; else rig.yaw -= a; }
+  if (!gyro && mv.has('tiltU')) rig.pitch = Math.min(1.55, rig.pitch + a);
+  if (!gyro && mv.has('tiltD')) rig.pitch = Math.max(-1.55, rig.pitch - a);
+  if (mv.has('arcL') || mv.has('arcR')) {          // orbit the subject, keep looking at it
+    const s = framedSubject(), c = s ? subjectInfo(s).center : bounds.getCenter(new THREE.Vector3());
+    const ang = (mv.has('arcL') ? -1 : 1) * m / Math.max(0.5, Math.hypot(rig.x - c.x, rig.z - c.z));
+    const dx = rig.x - c.x, dz = rig.z - c.z, cs = Math.cos(ang), sn = Math.sin(ang);
+    rig.x = c.x + dx * cs + dz * sn; rig.z = c.z - dx * sn + dz * cs;
+    if (gyro) yawOffset += ang; else rig.yaw += ang;
+  }
+  if (mv.has('zoomIn') || mv.has('zoomOut')) {
+    rig.lens = THREE.MathUtils.clamp(rig.lens * Math.exp((mv.has('zoomIn') ? 1 : -1) * dt * 0.8), Z_MIN, Z_MAX); syncLens();
+  }
+  if (mv.has('dutchL') || mv.has('dutchR')) setDutch(rig.roll + (mv.has('dutchL') ? -a : a));
+}
+function setDutch(r) { rig.roll = THREE.MathUtils.clamp(r, -Math.PI / 4, Math.PI / 4); $('dutch').value = Math.round(THREE.MathUtils.radToDeg(rig.roll)); $('dutchv').textContent = $('dutch').value + '°'; }
+$('dutch').oninput = e => setDutch(THREE.MathUtils.degToRad(+e.target.value));
+
+// ---------- position sliders and eye-line presets ----------
+$('posX').oninput = e => { rig.x = +e.target.value; clearPreset(); };
+$('posZ').oninput = e => { rig.z = +e.target.value; clearPreset(); };
+$('panS').oninput = e => { setLook(THREE.MathUtils.degToRad(-(+e.target.value)), Math.asin(THREE.MathUtils.clamp(currentDir().y, -1, 1))); clearPreset(); };
+$('tiltS').oninput = e => { setLook(currentYaw(), THREE.MathUtils.degToRad(+e.target.value)); clearPreset(); };
+function syncPositionUI() {
+  const f = (id, v, txt) => { if (document.activeElement !== $(id)) $(id).value = v; $(id + 'v').textContent = txt; };
+  $('posX').min = (bounds.min.x - 3).toFixed(1); $('posX').max = (bounds.max.x + 3).toFixed(1);
+  $('posZ').min = (bounds.min.z - 3).toFixed(1); $('posZ').max = (bounds.max.z + 3).toFixed(1);
+  f('posX', rig.x, fmtM(rig.x)); f('posZ', rig.z, fmtM(rig.z));
+  const pan = Math.round(((THREE.MathUtils.radToDeg(-currentYaw()) % 360) + 360) % 360), tilt = Math.round(THREE.MathUtils.radToDeg(Math.asin(THREE.MathUtils.clamp(currentDir().y, -1, 1))));
+  f('panS', pan, pan + '°'); f('tiltS', tilt, tilt + '°');
+}
+[['Low angle', 0.6, 8], ['Seated eye line', 1.15, 0], ['Standing eye line', 1.6, 0], ['High angle', 2.3, -20], ['Overhead', 3.0, -80]].forEach(([t, hgt, tilt]) => {
+  const b = document.createElement('button'); b.className = 'mini'; b.textContent = t;
+  b.onclick = () => { rig.y = bounds.min.y + hgt; hIn.max = Math.max(+hIn.max, rig.y + 0.3); hIn.value = rig.y; setLook(currentYaw(), THREE.MathUtils.degToRad(tilt)); clearPreset(); };
+  $('eyelines').append(b);
+});
+
+// ---------- camera move: start / end / play ----------
+const move = { start: null, end: null, len: 4, playing: false, t0: 0 };
+const camState = () => { const d = currentDir(); return { x: rig.x, y: rig.y, z: rig.z, yaw: Math.atan2(-d.x, -d.z), pitch: Math.asin(THREE.MathUtils.clamp(d.y, -1, 1)), roll: rig.roll, lens: rig.lens }; };
+function moveStatus() {
+  $('mvState').textContent = move.start && move.end ? `Move set: ${move.len.toFixed(1)} s from start to end.` : move.start ? 'Start set. Frame the ending, then Set end.' : move.end ? 'End set. Frame the opening, then Set start.' : 'No camera move set.';
+  $('mvPlay').textContent = move.playing ? 'Stop' : 'Play move';
+}
+$('mvStart').onclick = () => { move.start = camState(); moveStatus(); };
+$('mvEnd').onclick = () => { move.end = camState(); moveStatus(); };
+$('mvClear').onclick = () => { move.start = move.end = null; move.playing = false; moveStatus(); };
+$('mvLen').oninput = e => { move.len = +e.target.value; $('mvLenv').textContent = move.len.toFixed(1) + ' s'; moveStatus(); };
+function togglePlay() {
+  if (!move.start || !move.end) { note('Set a start and an end first (Camera tab).', 3000); return; }
+  if (gyro) motionOff();
+  move.playing = !move.playing; move.t0 = performance.now(); moveStatus();
+}
+$('mvPlay').onclick = togglePlay;
+function stepMove(now) {
+  if (!move.playing) return;
+  const t = Math.min(1, (now - move.t0) / 1000 / move.len), e = t * t * (3 - 2 * t), A = move.start, B = move.end;
+  const L = (a, b) => a + (b - a) * e;
+  let dy = B.yaw - A.yaw; dy = Math.atan2(Math.sin(dy), Math.cos(dy));
+  Object.assign(rig, { x: L(A.x, B.x), y: L(A.y, B.y), z: L(A.z, B.z), yaw: A.yaw + dy * e, pitch: L(A.pitch, B.pitch), roll: L(A.roll, B.roll), lens: L(A.lens, B.lens) });
+  hIn.value = rig.y; syncLens(); setDutch(rig.roll);
+  if (t >= 1) { move.playing = false; moveStatus(); }
+}
+addEventListener('keydown', e => { if (e.key === ' ' && !/INPUT|TEXTAREA|SELECT|BUTTON/.test(e.target.tagName) && $('bv').hidden && $('pm').hidden) { e.preventDefault(); togglePlay(); } });
+
+// ---------- witness view: orbit the set; see camera, frustum, focus plane, near/far limits and lamps ----------
+let viewMode = 'camera';
+const wcam = new THREE.PerspectiveCamera(45, 1, 0.05, 800);
+const orbit = { az: 0.9, el: 0.55, r: 7, target: new THREE.Vector3() };
+const witness = new THREE.Group(); witness.visible = false; scene.add(witness);
+const camBody = new THREE.Group();
+camBody.add(new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.1, 0.18), new THREE.MeshBasicMaterial({ color: 0xf2b134 })));
+const lensCone = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.045, 0.08, 16), new THREE.MeshBasicMaterial({ color: 0x222222 }));
+lensCone.rotation.x = Math.PI / 2; lensCone.position.z = -0.13; camBody.add(lensCone);
+witness.add(camBody);
+const frGeo = new THREE.BufferGeometry(); frGeo.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(16 * 3), 3));
+const frLines = new THREE.LineSegments(frGeo, new THREE.LineBasicMaterial({ color: 0xf2b134 })); frLines.frustumCulled = false; witness.add(frLines);
+const plane = (color, op) => new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ color, transparent: true, opacity: op, side: THREE.DoubleSide, depthWrite: false }));
+const focusPlane = plane(0x6fd3ff, 0.2), nearPlane = plane(0x6fd3ff, 0.07), farPlane = plane(0x6fd3ff, 0.07);
+witness.add(focusPlane, nearPlane, farPlane);
+function updateWitness() {
+  camBody.position.copy(cam.position); camBody.quaternion.copy(cam.quaternion);
+  const place = (mesh, dist) => {
+    const d = THREE.MathUtils.clamp(dist, 0.1, 60), hw = d * SENSOR_W / 2 / rig.lens, hh = d * SENSOR_H / 2 / rig.lens;
+    mesh.visible = isFinite(dist); mesh.position.copy(new THREE.Vector3(0, 0, -d).applyQuaternion(cam.quaternion).add(cam.position));
+    mesh.quaternion.copy(cam.quaternion); mesh.scale.set(hw * 2, hh * 2, 1); return [hw, hh, d];
+  };
+  const [hw, hh, d] = place(focusPlane, focusDist);
+  const [nr, fr] = dofRange(); place(nearPlane, nr); place(farPlane, isFinite(fr) ? fr : Infinity);
+  const P = (x, y) => new THREE.Vector3(x, y, -d).applyQuaternion(cam.quaternion).add(cam.position);
+  const o = cam.position, c = [P(-hw, -hh), P(hw, -hh), P(hw, hh), P(-hw, hh)];
+  const pts = [o, c[0], o, c[1], o, c[2], o, c[3], c[0], c[1], c[1], c[2], c[2], c[3], c[3], c[0]];
+  const arr = frGeo.attributes.position.array; pts.forEach((p, i) => arr.set([p.x, p.y, p.z], i * 3)); frGeo.attributes.position.needsUpdate = true;
+  wcam.position.set(orbit.target.x + orbit.r * Math.cos(orbit.el) * Math.sin(orbit.az), orbit.target.y + orbit.r * Math.sin(orbit.el), orbit.target.z + orbit.r * Math.cos(orbit.el) * Math.cos(orbit.az));
+  wcam.lookAt(orbit.target);
+}
+function setView(m) {
+  viewMode = m; $('vCam').setAttribute('aria-pressed', m === 'camera'); $('vWit').setAttribute('aria-pressed', m === 'witness');
+  stage.classList.toggle('witness', m === 'witness'); $('wlabel').hidden = m !== 'witness';
+  if (m === 'witness') {
+    const s = framedSubject();
+    orbit.target.copy(s ? subjectInfo(s).center : bounds.getCenter(new THREE.Vector3())); orbit.target.y += 0.9;
+    orbit.az = currentYaw() + 0.9; orbit.el = 0.5;
+    orbit.r = Math.max(4, Math.hypot(cam.position.x - orbit.target.x, cam.position.z - orbit.target.z) * 1.8);
+  }
+}
+$('vCam').onclick = () => setView('camera'); $('vWit').onclick = () => setView('witness');
+const activeCam = () => viewMode === 'witness' ? wcam : cam;
+stage.addEventListener('wheel', e => {
+  e.preventDefault();
+  if (viewMode === 'witness') { orbit.r = THREE.MathUtils.clamp(orbit.r * Math.exp(e.deltaY * 0.001), 1, 60); return; }
+  if (e.shiftKey) { rig.lens = THREE.MathUtils.clamp(rig.lens * Math.exp(-e.deltaY * 0.001), Z_MIN, Z_MAX); syncLens(); return; }   // shift+scroll zooms
+  const d = currentDir(), f = new THREE.Vector3(d.x, 0, d.z).normalize(), m = -e.deltaY * 0.002;                                       // scroll dollies
+  rig.x += f.x * m; rig.z += f.z * m; clearPreset();
+}, { passive: false });
+
+// ---------- lens: focal chips, zoom, dolly zoom, aperture ----------
+const Z_MIN = 12, Z_MAX = 200;
+const zoomToSlider = mm => Math.round(1000 * Math.log(mm / Z_MIN) / Math.log(Z_MAX / Z_MIN));
+const sliderToZoom = v => Math.round(Z_MIN * Math.pow(Z_MAX / Z_MIN, v / 1000));
+function setLens(mm) {
+  const old = rig.lens;
+  if ($('dolly').checked && old !== mm) {
+    const s = framedSubject();
+    if (s) {
+      const eye = subjectInfo(s).eye, d = currentDir(), depth = eye.clone().sub(cam.position).dot(d);
+      if (depth > 0.1) { const shift = depth - depth * mm / old; rig.x += d.x * shift; rig.y += d.y * shift; rig.z += d.z * shift; hIn.value = rig.y; }
+    }
+  }
+  rig.lens = mm; syncLens();
+}
+$('zoom').oninput = e => setLens(sliderToZoom(+e.target.value));
+const THIRDS = [1.4, 1.6, 1.8, 2, 2.2, 2.5, 2.8, 3.2, 3.5, 4, 4.5, 5, 5.6, 6.3, 7.1, 8, 11, 16, 22];
+$('apS').max = THIRDS.length - 1;
+$('apS').oninput = e => { fstop = THIRDS[+e.target.value]; syncStops(); };
+
+// ---------- focus: auto / track a subject / manual, rack focus ----------
+let focusMode = 'auto', rack = null;
+function renderFocusOptions() {
+  const sel = $('focusOn'), prev = focusMode; sel.textContent = '';
+  const add = (v, t) => { const o = document.createElement('option'); o.value = v; o.textContent = t; sel.append(o); };
+  add('auto', 'Auto (subject nearest the centre)');
+  subjects.forEach((s, i) => add('s' + i, `${s.name} (tracks them)`));
+  add('manual', 'Manual (use the Distance slider)');
+  sel.value = [...sel.options].some(o => o.value === prev) ? prev : 'auto';
+  const racks = $('racks'); racks.textContent = '';
+  subjects.forEach((s, i) => { const b = document.createElement('button'); b.className = 'btn load'; b.textContent = `Rack to ${s.name}`; b.onclick = () => rackTo(i); racks.append(b); });
+}
+$('focusOn').onchange = e => setFocusMode(e.target.value);
+function setFocusMode(m) { focusMode = m; autoFocus = m !== 'manual'; $('af').setAttribute('aria-pressed', autoFocus); $('focusOn').value = m; rack = null; }
+$('af').onclick = () => setFocusMode(focusMode === 'manual' ? 'auto' : 'manual');
+$('rackT').oninput = e => { $('rackTv').textContent = (+e.target.value).toFixed(1) + ' s'; };
+function subjectDepth(i) { const s = subjects[i]; if (!s) return null; const v = subjectInfo(s).eye.sub(cam.position).dot(currentDir()); return v > 0.05 ? v : null; }
+function rackTo(i) { rack = { from: focusDist, i, t0: performance.now(), dur: +$('rackT').value * 1000 }; focusMode = 's' + i; autoFocus = true; $('focusOn').value = focusMode; $('af').setAttribute('aria-pressed', 'true'); }
+function focusTargetFor(pick) {
+  if (focusMode.startsWith('s')) { const d = subjectDepth(+focusMode.slice(1)); return d == null ? focusTarget : d; }
+  const m = measureFocus(pick); return isFinite(m) ? m : F_MAX;
+}
+function stepFocus(now, dt) {
+  if (rack) {
+    const to = subjectDepth(rack.i) ?? rack.from, t = Math.min(1, (now - rack.t0) / rack.dur), e = t * t * (3 - 2 * t);
+    focusDist = THREE.MathUtils.clamp(rack.from + (to - rack.from) * e, F_MIN, F_MAX);
+    if (t >= 1) rack = null;
+  } else if (autoFocus) focusDist += (focusTarget - focusDist) * (1 - Math.exp(-dt * 6));
+}
+
+// ---------- colour temperature ----------
+function kelvinRaw(k) {
+  const t = THREE.MathUtils.clamp(k, 1000, 40000) / 100;
+  let r, g, b;
+  if (t <= 66) { r = 255; g = 99.4708025861 * Math.log(t) - 161.1195681661; } else { r = 329.698727446 * Math.pow(t - 60, -0.1332047592); g = 288.1221695283 * Math.pow(t - 60, -0.0755148492); }
+  b = t >= 66 ? 255 : t <= 19 ? 0 : 138.5177312231 * Math.log(t - 10) - 305.0447927307;
+  return [r, g, b].map(c => { c = THREE.MathUtils.clamp(c, 0, 255) / 255; return c > 0.04045 ? Math.pow((c + 0.055) / 1.055, 2.4) : c / 12.92; });
+}
+function kelvinColor(k) { const a = kelvinRaw(k), d = kelvinRaw(5600), rel = a.map((v, i) => v / d[i]), m = Math.max(...rel); return new THREE.Color(rel[0] / m, rel[1] / m, rel[2] / m); }
+
+// ---------- Light tab: lamps (key / fill / back), window daylight, practicals, ambient ----------
+const LUX = 25;                     // shown lux per (candela / m²) in this scene's light units
+const FIXTURES = { softbox: ['Soft box', 1.0, 0.85, 80], fresnel: ['Fresnel', 1.6, 0.2, 35], led: ['LED panel', 1.0, 0.6, 60], china: ['China ball', 0.6, 0.95, 120], bulb: ['Open bulb', 0.5, 0.1, 150] };
+const GELS = { none: ['No gel', null, 1], cto: ['Full CTO (warm)', 3200, 0.55], hcto: ['½ CTO', 4100, 0.75], ctb: ['Full CTB (cool)', 9800, 0.35], hctb: ['½ CTB', 7000, 0.6],
+               green: ['Plus green', [0.82, 1, 0.82], 0.8], red: ['Red', [1, 0.22, 0.22], 0.2], night: ['Night blue', [0.45, 0.62, 1], 0.3], amber: ['Amber', [1, 0.72, 0.35], 0.6] };
+const LIGHT_DEFS = [['key', 'Key', 'K'], ['fill', 'Fill', 'F'], ['back', 'Back', 'B']];
+const rigLights = {};
+let lightPreset = 'work';
+const lampGroup = new THREE.Group(); scene.add(lampGroup);
+const standMat = new THREE.MeshBasicMaterial({ color: 0x2a2c30 });
+LIGHT_DEFS.forEach(([id]) => {
+  const spot = new THREE.SpotLight(0xffffff, 0, 0, 0.7, 0.5, 2);
+  spot.castShadow = id !== 'fill'; spot.shadow.mapSize.set(1024, 1024); spot.shadow.bias = -0.0004; spot.visible = false;
+  scene.add(spot, spot.target);
+  const g = new THREE.Group();
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 1, 8), standMat);
+  const legs = new THREE.Mesh(new THREE.ConeGeometry(0.28, 0.12, 3, 1, true), standMat);
+  const head = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.22, 0.14), new THREE.MeshBasicMaterial({ color: 0x111214 }));
+  const face = new THREE.Mesh(new THREE.PlaneGeometry(0.26, 0.2), new THREE.MeshBasicMaterial({ color: 0xffffff })); face.position.z = 0.071;
+  head.add(face);
+  const lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(6), 3));
+  const beam = new THREE.Line(lg, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 })); beam.frustumCulled = false;
+  witness.add(beam);
+  g.add(pole, legs, head); lampGroup.add(g);
+  rigLights[id] = { spot, g, pole, legs, head, face, beam, p: { on: false, fixture: 'softbox', dim: 0.55, k: 5600, gel: 'none', soft: 0.85, beam: 80, height: 2.1, x: 0, z: 0, aim: 'between' } };
+});
+function aimPoint(aim) {
+  if (aim === 'centre' || !subjects.length) return bounds.getCenter(new THREE.Vector3()).setY(bounds.min.y + 1.4);
+  if (aim === 'between') {
+    const s = subjects.slice(0, 2).map(x => subjectInfo(x).eye);
+    return s.length > 1 ? s[0].add(s[1]).multiplyScalar(0.5) : s[0];
+  }
+  const s = subjects[+aim.slice(1)]; return s ? subjectInfo(s).eye : aimPoint('centre');
+}
+function gelled(p) {
+  const g = GELS[p.gel] || GELS.none; let c = kelvinColor(p.k);
+  if (typeof g[1] === 'number') { const a = kelvinRaw(g[1]), b = kelvinRaw(g[1] === 3200 || g[1] === 4100 ? 5600 : 3200); const m = a.map((v, i) => v / b[i]), mx = Math.max(...m); c = new THREE.Color(c.r * m[0] / mx, c.g * m[1] / mx, c.b * m[2] / mx); }
+  else if (Array.isArray(g[1])) c = new THREE.Color(c.r * g[1][0], c.g * g[1][1], c.b * g[1][2]);
+  return { color: c, trans: g[2] };
+}
+function lampLux(id) {
+  const L = rigLights[id], p = L.p; if (!p.on) return 0;
+  const t = aimPoint(p.aim), d = Math.max(0.3, L.spot.position.distanceTo(t));
+  return L.spot.intensity / (d * d) * LUX;
+}
+function positionLights() {
+  for (const id in rigLights) {
+    const L = rigLights[id], p = L.p, F = FIXTURES[p.fixture] || FIXTURES.softbox, { color, trans } = gelled(p);
+    const floor = bounds.min.y, pos = new THREE.Vector3(p.x, floor + p.height, p.z), t = aimPoint(p.aim);
+    L.spot.position.copy(pos); L.spot.target.position.copy(t); L.spot.target.updateMatrixWorld();
+    L.spot.visible = p.on; L.spot.intensity = p.on ? p.dim * F[1] * 60 * trans : 0;
+    L.spot.color.copy(color); L.spot.angle = THREE.MathUtils.degToRad(Math.min(170, p.beam) / 2); L.spot.penumbra = 0.05 + 0.95 * p.soft; L.spot.shadow.radius = 1 + 8 * p.soft;
+    L.g.visible = p.on;
+    L.pole.scale.y = Math.max(0.05, p.height - 0.1); L.pole.position.set(p.x, floor + (p.height - 0.1) / 2, p.z);
+    L.legs.position.set(p.x, floor + 0.06, p.z);
+    L.head.position.copy(pos); L.head.lookAt(t); L.face.material.color.copy(color);
+    L.beam.visible = p.on; const a = L.beam.geometry.attributes.position.array; a.set([...pos.toArray(), ...t.toArray()]); L.beam.geometry.attributes.position.needsUpdate = true;
+  }
+  updateRatio(); renderLightCards(false);
+}
+function updateRatio() {
+  const k = lampLux('key'), f = lampLux('fill');
+  $('ratio').textContent = !k ? 'No key lamp: window, practicals and ambient only' : !f ? 'Key : fill — key only, no fill lamp'
+    : `Key : fill ${(k / f).toFixed(1)} : 1 (${Math.log2(k / f).toFixed(1)} stops)`;
+}
+// Window daylight = the sun (directional) + sky fill (hemisphere); ambient bounce; practicals = the set's own lamps
+const amb = new THREE.AmbientLight(0xffffff, 0.2); scene.add(amb);
+const env = { winOn: true, sun: 1, sky: 1, sunK: 5600, ovc: 0.2, sunDir: 40, sunH: 40, pracOn: true, pracDim: 1, pracK: 2800, pracTouched: false, amb: 10, ambK: 5600 };
+function applyEnv() {
+  const c = bounds.getCenter(new THREE.Vector3()), s = bounds.getSize(new THREE.Vector3()), r = Math.max(s.x, s.z, 4) * 1.5;
+  const az = THREE.MathUtils.degToRad(env.sunDir), el = THREE.MathUtils.degToRad(env.sunH);
+  key.position.set(c.x + r * Math.cos(el) * Math.sin(az), c.y + r * Math.sin(el), c.z + r * Math.cos(el) * Math.cos(az)); key.target.position.copy(c); key.target.updateMatrixWorld();
+  key.intensity = env.winOn ? 3.2 * env.sun * (1 - 0.85 * env.ovc) : 0;
+  key.color.copy(kelvinColor(env.sunK)); key.shadow.radius = 1 + 10 * env.ovc;
+  hemi.intensity = env.winOn ? 1.7 * env.sky * (1 + 0.8 * env.ovc) : 0;
+  hemi.color.copy(kelvinColor(Math.min(12000, env.sunK + 2500)));
+  amb.intensity = env.amb * 0.02; amb.color.copy(kelvinColor(env.ambK));
+  setLevel = env.pracOn ? env.pracDim : 0; applySetLights();
+  if (env.pracTouched) setLights.forEach(l => l.light.color.copy(kelvinColor(env.pracK)));
+  const fmt = { sun: v => Math.round(v * 100) + '%', sky: v => Math.round(v * 100) + '%', sunK: v => v + ' K', ovc: v => v < 0.25 ? 'Clear' : v > 0.75 ? 'Overcast' : 'Hazy',
+                sunDir: v => v + '°', sunH: v => v + '°', pracDim: v => Math.round(v * 100) + '%', pracK: v => v + ' K', amb: v => String(v), ambK: v => v + ' K' };
+  for (const k in fmt) { if (document.activeElement !== $(k)) $(k).value = env[k]; $(k + 'v').textContent = fmt[k](env[k]); }
+  $('winOn').checked = env.winOn; $('pracOn').checked = env.pracOn;
+  $('winCard').classList.toggle('off', !env.winOn); $('pracCard').classList.toggle('off', !env.pracOn);
+}
+['sun', 'sky', 'sunK', 'ovc', 'sunDir', 'sunH', 'pracDim', 'pracK', 'amb', 'ambK'].forEach(k => $(k).oninput = e => { env[k] = +e.target.value; if (k === 'pracK') env.pracTouched = true; applyEnv(); markPresetCustom(); });
+$('winOn').onchange = e => { env.winOn = e.target.checked; applyEnv(); markPresetCustom(); };
+$('pracOn').onchange = e => { env.pracOn = e.target.checked; applyEnv(); markPresetCustom(); };
+
+// presets: lamp = [side° from camera (− = camera-left), elevation°, distance m, dimmer, K, fixture, gel]
+const LIGHT_PRESETS = {
+  work:      { name: 'Work lights', desc: 'Even light to block and frame', wb: 5600, env: { winOn: true, sun: 1, sky: 1, sunK: 5600, ovc: 0.2, pracOn: true, pracDim: 1, amb: 10, ambK: 5600 } },
+  diner:     { name: 'Diner day', desc: 'Window daylight, warm practicals', wb: 5200, env: { winOn: true, sun: 0.6, sky: 0.55, sunK: 5600, ovc: 0.3, sunH: 38, pracOn: true, pracDim: 0.55, pracK: 2800, amb: 14, ambK: 5600 },
+               fill: [35, 15, 2.6, 0.25, 5600, 'softbox'] },
+  three:     { name: 'Three-point', desc: 'Classic key, fill, back at 3200 K', wb: 3200, env: { winOn: false, pracOn: true, pracDim: 0.3, amb: 8, ambK: 3200 },
+               key: [-45, 30, 2.3, 0.55, 3200, 'softbox'], fill: [40, 10, 2.8, 0.25, 3200, 'softbox'], back: [160, 40, 2.4, 0.5, 3200, 'fresnel'] },
+  rembrandt: { name: 'Rembrandt', desc: 'One hard key, high and to the side', wb: 3200, env: { winOn: false, pracOn: true, pracDim: 0.15, amb: 5, ambK: 3200 },
+               key: [-55, 45, 2.2, 0.7, 3200, 'fresnel'] },
+  highkey:   { name: 'High-key', desc: 'Soft, bright, low contrast', wb: 5600, env: { winOn: true, sun: 0.5, sky: 0.9, ovc: 0.8, pracOn: true, pracDim: 0.6, amb: 30, ambK: 5600 },
+               key: [-30, 25, 2.4, 0.7, 5600, 'softbox'], fill: [30, 10, 2.4, 0.6, 5600, 'softbox'], back: [170, 40, 2.4, 0.4, 5600, 'softbox'] },
+  night:     { name: 'Low-key night', desc: 'Practicals only, blue night outside', wb: 3200, env: { winOn: true, sun: 0, sky: 0.3, sunK: 9500, ovc: 1, pracOn: true, pracDim: 0.85, pracK: 2700, amb: 3, ambK: 7000 } },
+  mixed:     { name: 'Mixed colour temps', desc: 'Tungsten inside, daylight outside', wb: 4300, env: { winOn: true, sun: 0.7, sky: 0.6, sunK: 5600, ovc: 0.2, pracOn: true, pracDim: 0.6, pracK: 2800, amb: 10, ambK: 5600 },
+               key: [-45, 30, 2.3, 0.5, 3200, 'softbox'] },
+  noir:      { name: 'Film noir', desc: 'Hard high key, deep shadows (extra)', wb: 3200, env: { winOn: false, pracOn: true, pracDim: 0.1, amb: 2, ambK: 4000 },
+               key: [-60, 55, 2.5, 0.9, 3200, 'fresnel'], back: [150, 35, 2.5, 0.5, 4300, 'fresnel'] },
+  silhouette:{ name: 'Silhouette', desc: 'Backlight only, face in shadow (extra)', wb: 5600, env: { winOn: false, pracOn: false, amb: 1, ambK: 5600 },
+               back: [180, 15, 3, 1.4, 5600, 'fresnel'] },
+  golden:    { name: 'Golden hour', desc: 'Low warm sun, cool sky fill (extra)', wb: 5600, env: { winOn: true, sun: 1.3, sky: 0.5, sunK: 3000, ovc: 0.1, sunH: 6, pracOn: false, amb: 6, ambK: 8000 },
+               fill: [30, 10, 2.8, 0.3, 8000, 'softbox'] }
+};
+function placeLamp(id, v) {
+  const p = rigLights[id].p;
+  if (!v) { p.on = false; return; }
+  const [side, elev, dist, dim, k, fix, gel] = v, t = aimPoint(p.aim), az = Math.atan2(cam.position.x - t.x, cam.position.z - t.z);
+  const toCam = new THREE.Vector3(Math.sin(az), 0, Math.cos(az)), right = new THREE.Vector3(Math.cos(az), 0, -Math.sin(az)), sd = THREE.MathUtils.degToRad(side), el = THREE.MathUtils.degToRad(elev);
+  const dir = toCam.multiplyScalar(Math.cos(sd)).add(right.multiplyScalar(Math.sin(sd)));
+  p.x = t.x + dir.x * dist * Math.cos(el); p.z = t.z + dir.z * dist * Math.cos(el);
+  p.height = Math.max(0.3, t.y - bounds.min.y + dist * Math.sin(el));
+  Object.assign(p, { on: true, dim, k, fixture: fix, gel: gel || 'none', soft: FIXTURES[fix][2], beam: FIXTURES[fix][3] });
+}
+function applyLightPreset(name) {
+  const P = LIGHT_PRESETS[name]; lightPreset = name;
+  LIGHT_DEFS.forEach(([id]) => { rigLights[id].p.aim = 'between'; placeLamp(id, P[id]); });
+  Object.assign(env, { winOn: true, sun: 1, sky: 1, sunK: 5600, ovc: 0.2, sunDir: env.sunDir, sunH: 40, pracOn: true, pracDim: 1, amb: 10, ambK: 5600 }, P.env);
+  env.pracTouched = 'pracK' in P.env; if (!env.pracTouched) env.pracK = 2800;
+  applyEnv(); positionLights(); renderLightCards(true);
+  grade.wb = P.wb; syncGradeUI();
+  [...$('lpresets').children].forEach(b => b.setAttribute('aria-pressed', b.dataset.p === name));
+}
+Object.entries(LIGHT_PRESETS).forEach(([id, P]) => {
+  const b = document.createElement('button'); b.dataset.p = id; b.setAttribute('aria-pressed', id === lightPreset);
+  const t = document.createElement('b'); t.textContent = P.name; const d = document.createElement('small'); d.textContent = P.desc;
+  b.append(t, d); b.onclick = () => applyLightPreset(id); $('lpresets').append(b);
+});
+function markPresetCustom() { lightPreset = 'custom'; [...$('lpresets').children].forEach(b => b.setAttribute('aria-pressed', 'false')); }
+const LSLIDERS = [['dim', 'Dimmer', 0, 1.5, 0.01, v => Math.round(v * 100) + '%'], ['k', 'Colour temp', 2000, 10000, 50, v => v + ' K'],
+                  ['soft', 'Hard ↔ soft', 0, 1, 0.01, v => v < 0.25 ? 'Hard' : v > 0.7 ? 'Soft' : 'Medium'], ['beam', 'Beam spread', 10, 160, 1, v => v + '°'],
+                  ['height', 'Height', 0.3, 4, 0.05, v => fmtM(v)]];
+function renderLightCards(rebuild) {
+  const box = $('lcards');
+  if (rebuild || !box.children.length) {
+    box.textContent = '';
+    LIGHT_DEFS.forEach(([id, name]) => {
+      const L = rigLights[id], card = document.createElement('div'); card.className = 'lcard'; card.id = 'lc-' + id;
+      const hd = document.createElement('header'); const sw = document.createElement('span'); sw.className = 'sw';
+      const nm = document.createElement('b'); nm.textContent = name;
+      const tg = document.createElement('label'); tg.className = 'tog'; tg.style.flex = 'none';
+      const cb = document.createElement('input'); cb.type = 'checkbox'; cb.id = 'lon-' + id;
+      cb.onchange = () => { L.p.on = cb.checked; if (cb.checked && !L.p.x && !L.p.z) placeLamp(id, LIGHT_PRESETS.three[id]); positionLights(); markPresetCustom(); };
+      tg.htmlFor = cb.id; tg.append(cb, 'On'); hd.append(sw, nm, tg);
+      const lux = document.createElement('div'); lux.className = 'lux'; lux.id = 'lux-' + id;
+      card.append(hd, lux);
+      const selRow = (label, key, opts) => {
+        const l = document.createElement('label'); l.className = 'slider'; l.htmlFor = `l-${id}-${key}`; l.style.display = 'flex';
+        const sp = document.createElement('span'); sp.textContent = label;
+        const sel = document.createElement('select'); sel.className = 'sel'; sel.id = l.htmlFor;
+        opts.forEach(([v, t]) => { const o = document.createElement('option'); o.value = v; o.textContent = t; sel.append(o); });
+        sel.onchange = () => {
+          L.p[key] = sel.value;
+          if (key === 'fixture') { const F = FIXTURES[sel.value]; L.p.soft = F[2]; L.p.beam = F[3]; }
+          if (!L.p.on) { L.p.on = true; }
+          positionLights(); markPresetCustom();
+        };
+        l.append(sp, sel); card.append(l);
+      };
+      selRow('Fixture', 'fixture', Object.entries(FIXTURES).map(([k, v]) => [k, v[0]]));
+      LSLIDERS.forEach(([key, label, mn, mx, st, fmt], i) => {
+        if (i === 2) selRow('Gel', 'gel', Object.entries(GELS).map(([k, v]) => [k, v[0]]));
+        const l = document.createElement('label'); l.className = 'slider'; l.htmlFor = `l-${id}-${key}`;
+        const sp = document.createElement('span'); sp.textContent = label;
+        const inp = document.createElement('input'); inp.type = 'range'; inp.id = l.htmlFor; inp.min = mn; inp.max = mx; inp.step = st;
+        const out = document.createElement('output'); out.id = `lo-${id}-${key}`;
+        inp.oninput = () => { L.p[key] = +inp.value; if (!L.p.on) L.p.on = true; positionLights(); markPresetCustom(); };
+        l.append(sp, inp, out); card.append(l);
+      });
+      selRow('Aimed at', 'aim', [['between', 'Between them'], ...subjects.map((s, i) => ['s' + i, s.name]), ['centre', 'Set centre']]);
+      box.append(card);
+    });
+  }
+  LIGHT_DEFS.forEach(([id]) => {
+    const L = rigLights[id], card = $('lc-' + id); if (!card) return;
+    card.classList.toggle('off', !L.p.on); card.querySelector('.sw').style.background = '#' + gelled(L.p).color.getHexString();
+    $('lon-' + id).checked = L.p.on;
+    const who = L.p.aim === 'between' ? 'the subjects' : L.p.aim === 'centre' ? 'set centre' : (subjects[+L.p.aim.slice(1)] || {}).name || 'subject';
+    $('lux-' + id).textContent = L.p.on ? `${Math.round(lampLux(id))} lux at ${who} · ${L.p.k} K` : 'Off';
+    ['fixture', 'gel', 'aim'].forEach(k => { const s = $(`l-${id}-${k}`); if (s && document.activeElement !== s) s.value = L.p[k]; });
+    LSLIDERS.forEach(([key, , , , , fmt]) => { const inp = $(`l-${id}-${key}`); if (document.activeElement !== inp) inp.value = L.p[key]; $(`lo-${id}-${key}`).textContent = fmt(+L.p[key]); });
+  });
+}
+$('showLamps').onchange = () => {};
+renderLightCards(true); updateRatio();
+
+// ---------- Image tab: exposure, ND, WB, monitor tools, look, performance ----------
+const LOOKS = {
+  neutral: { name: 'Neutral', lift: [0, 0, 0], gain: [1, 1, 1], sat: 1, con: 1, vig: 0, grain: 0, mono: 0 },
+  warm:    { name: 'Warm film', lift: [0.02, 0.01, 0], gain: [1.04, 1, 0.9], sat: 0.9, con: 1.05, vig: 0.25, grain: 0.03, mono: 0 },
+  teal:    { name: 'Teal & orange', lift: [0, 0.03, 0.06], gain: [1.07, 0.98, 0.88], sat: 1.15, con: 1.12, vig: 0.2, grain: 0, mono: 0 },
+  bleach:  { name: 'Bleach bypass', lift: [0, 0, 0], gain: [1.02, 1.02, 1], sat: 0.45, con: 1.35, vig: 0.3, grain: 0.04, mono: 0 },
+  noir:    { name: 'Noir B&W', lift: [0, 0, 0], gain: [1, 1, 1], sat: 1, con: 1.3, vig: 0.45, grain: 0.06, mono: 1 },
+  night:   { name: 'Day for night', lift: [0, 0.01, 0.04], gain: [0.55, 0.65, 0.95], sat: 0.5, con: 1.1, vig: 0.35, grain: 0.02, mono: 0, expo: -1.2 },
+  vintage: { name: 'Vintage', lift: [0.06, 0.04, 0.02], gain: [1, 0.95, 0.84], sat: 0.7, con: 0.85, vig: 0.35, grain: 0.08, mono: 0 },
+  cool:    { name: 'Cool thriller', lift: [0, 0.01, 0.03], gain: [0.92, 1, 1.06], sat: 0.8, con: 1.15, vig: 0.25, grain: 0.02, mono: 0 },
+  pastel:  { name: 'Pastel', lift: [0.05, 0.04, 0.06], gain: [1, 0.98, 1], sat: 0.75, con: 0.8, vig: 0, grain: 0, mono: 0 }
+};
+const grade = { look: 'neutral', lift: [0, 0, 0], gain: [1, 1, 1], mono: 0, sat: 1, con: 1, vig: 0, grain: 0, wb: 5600, ev: 0, nd: 0, apExp: true, monitor: 'normal', peak: false, perf: 'medium' };
+const gSliders = [['con', v => Math.round(v * 100) + '%'], ['sat', v => Math.round(v * 100) + '%'], ['vig', v => Math.round(v * 100) + '%'], ['grain', v => Math.round(v / 0.25 * 100) + '%']];
+const ND = ['None', 'ND 0.3 · 1 stop', 'ND 0.6 · 2 stops', 'ND 0.9 · 3 stops', 'ND 1.2 · 4 stops', 'ND 1.5 · 5 stops', 'ND 1.8 · 6 stops'];
+function exposureStops() { return grade.ev - grade.nd + (grade.apExp ? 2 * Math.log2(4 / fstop) : 0); }
+function syncGradeUI() {
+  gSliders.forEach(([k, f]) => { $(k).value = grade[k]; $(k + 'v').textContent = f(grade[k]); });
+  $('wb').value = grade.wb; $('wbv').textContent = grade.wb + ' K';
+  $('expo').value = grade.ev; $('expov').textContent = (grade.ev > 0 ? '+' : '') + grade.ev.toFixed(1) + ' EV';
+  $('nd').value = grade.nd; $('ndv').textContent = ND[grade.nd]; $('apExp').checked = grade.apExp;
+  renderer.toneMappingExposure = Math.pow(2, exposureStops());
+  $('mNormal').setAttribute('aria-pressed', grade.monitor === 'normal'); $('mFalse').setAttribute('aria-pressed', grade.monitor === 'false');
+  $('peak').checked = grade.peak;
+  [...$('looks').children].forEach(b => b.setAttribute('aria-pressed', b.dataset.l === grade.look));
+  [...$('wbPresets').children].forEach(b => b.setAttribute('aria-pressed', +b.dataset.k === grade.wb));
+  [...$('perf').children].forEach(b => b.setAttribute('aria-pressed', b.dataset.q === grade.perf));
+}
+function applyLook(id) {
+  const L = LOOKS[id]; grade.look = id;
+  Object.assign(grade, { lift: L.lift, gain: L.gain, mono: L.mono, sat: L.sat, con: L.con, vig: L.vig, grain: L.grain });
+  if (L.expo !== undefined) grade.ev = L.expo;
+  syncGradeUI();
+}
+Object.entries(LOOKS).forEach(([id, L]) => { const b = document.createElement('button'); b.textContent = L.name; b.dataset.l = id; b.onclick = () => applyLook(id); $('looks').append(b); });
+gSliders.forEach(([k]) => $(k).oninput = e => { grade[k] = +e.target.value; syncGradeUI(); });
+[['Tungsten 3200 K', 3200], ['Fluorescent 4300 K', 4300], ['Daylight 5600 K', 5600], ['Shade 7000 K', 7000]].forEach(([t, k]) => {
+  const b = document.createElement('button'); b.className = 'mini'; b.textContent = t; b.dataset.k = k; b.onclick = () => { grade.wb = k; syncGradeUI(); }; $('wbPresets').append(b);
+});
+$('wb').oninput = e => { grade.wb = +e.target.value; syncGradeUI(); };
+$('expo').oninput = e => { grade.ev = +e.target.value; syncGradeUI(); };
+$('nd').oninput = e => { grade.nd = +e.target.value; syncGradeUI(); };
+$('apExp').onchange = e => { grade.apExp = e.target.checked; syncGradeUI(); };
+$('mNormal').onclick = () => { grade.monitor = 'normal'; syncGradeUI(); };
+$('mFalse').onclick = () => { grade.monitor = 'false'; syncGradeUI(); };
+$('peak').onchange = e => { grade.peak = e.target.checked; };
+function setPerf(q) {
+  grade.perf = q;
+  const dpr = window.devicePixelRatio || 1;
+  renderer.setPixelRatio(q === 'low' ? Math.min(dpr, 1) * 0.7 : q === 'high' ? Math.min(dpr, 2) : Math.min(dpr, 1.25));
+  renderer.shadowMap.enabled = q !== 'low';
+  scene.traverse(o => { if (o.material) (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => m.needsUpdate = true); });
+  layout(); syncGradeUI();
+}
+[...$('perf').children].forEach(b => b.onclick = () => setPerf(b.dataset.q));
+function wbGain() {
+  const d = kelvinRaw(5600), w = kelvinRaw(grade.wb), g = d.map((v, i) => v / w[i]);
+  const lum = 0.2126 * g[0] + 0.7152 * g[1] + 0.0722 * g[2];
+  return g.map(v => v / lum);
+}
+const gradeNeutral = () => grade.look === 'neutral' && grade.wb === 5600 && grade.sat === 1 && grade.con === 1 && grade.vig === 0 && grade.grain === 0;
+// (first sync happens at start-up, once the aperture exists)
+
 
 function currentDir() { return new THREE.Vector3(0, 0, -1).applyQuaternion(cam.quaternion); }
 function currentYaw() { const v = currentDir(); return Math.atan2(-v.x, -v.z); }
@@ -650,6 +1321,7 @@ function subjectInfo(s) {
   return { h, floor: b.min.y, center: new THREE.Vector3(cx, b.min.y, cz), eye: new THREE.Vector3(cx, b.max.y - 0.065 * h, cz), fwd: f };
 }
 function renderSubs() {
+  if (typeof renderSubjSeg === 'function' && $('subjSeg')) { renderSubjSeg(); renderFocusOptions(); }
   const box = $('subs'); box.textContent = '';
   if (!subjects.length) { const p = document.createElement('span'); p.className = 'hint'; p.textContent = 'No subjects yet.'; box.append(p); return; }
   subjects.forEach((s, i) => {
@@ -682,7 +1354,7 @@ $('pick').onclick = () => {
 const ray = new THREE.Raycaster();
 function pickAt(cx, cy) {
   const r = stage.getBoundingClientRect();
-  ray.setFromCamera({ x: (cx - r.left) / r.width * 2 - 1, y: -((cy - r.top) / r.height) * 2 + 1 }, cam);
+  ray.setFromCamera({ x: (cx - r.left) / r.width * 2 - 1, y: -((cy - r.top) / r.height) * 2 + 1 }, activeCam());
   const hit = ray.intersectObject(setRoot, true).find(h => h.object.isMesh && h.object.visible);
   picking = false; $('pick').setAttribute('aria-pressed', 'false'); stage.classList.remove('picking');
   if (!hit) { note('Nothing there. Try again on the actor.', 2500); return; }
@@ -748,7 +1420,7 @@ $('smooth').oninput = e => { smoothing = +e.target.value; $('smoothv').textConte
 // ---------- drag to look / tap to pick ----------
 let drag = null;
 stage.addEventListener('pointerdown', e => {
-  if (e.target.closest('#stick')) return;
+  if (e.target.closest('#stick, .viewseg')) return;
   drag = { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, id: e.pointerId }; stage.setPointerCapture(e.pointerId);
 });
 stage.addEventListener('pointermove', e => {
@@ -757,6 +1429,7 @@ stage.addEventListener('pointermove', e => {
   const dx = (e.clientX - drag.x) * k, dy = (e.clientY - drag.y) * k;
   drag.x = e.clientX; drag.y = e.clientY;
   if (picking || placing) return;
+  if (viewMode === 'witness') { orbit.az -= dx * 2.5; orbit.el = THREE.MathUtils.clamp(orbit.el + dy * 2.5, -0.2, 1.5); return; }
   if (gyro) yawOffset += dx;
   else { rig.yaw += dx; rig.pitch = THREE.MathUtils.clamp(rig.pitch + dy, -1.45, 1.45); }
 });
@@ -788,9 +1461,6 @@ addEventListener('keydown', e => { if (!/INPUT|TEXTAREA|SELECT/.test(e.target.ta
 addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
 
 // set lighting sliders
-$('work').oninput = e => { workLevel = +e.target.value; $('workv').textContent = Math.round(workLevel * 100) + '%'; applyWork(); };
-$('lights').oninput = e => { setLevel = +e.target.value; $('lightsv').textContent = Math.round(setLevel * 100) + '%'; applySetLights(); };
-$('expo').oninput = e => { const ev = +e.target.value; renderer.toneMappingExposure = Math.pow(2, ev); $('expov').textContent = (ev > 0 ? '+' : '') + ev.toFixed(1) + ' EV'; };
 
 // ---------- readouts ----------
 let current = null, lastShot = '';
@@ -823,7 +1493,7 @@ function readouts() {
   const zone = ZONES.find(z => horiz <= z[0]) || ZONES[3];
   lastShot = `${shot[0]} · ${rig.lens}mm · ${heightLabel(el)} · ${pick.s.name}`;
   set($('rShot'), shot[0]); set($('rAngle'), heightLabel(el)); set($('rSide'), sideLabel(side));
-  set($('rZone'), `${horiz.toFixed(1)} m ${zone[1]}`);
+  set($('rZone'), `${fmtM(horiz)} ${zone[1]}`);
   $('rZoneBox').style.setProperty('--zc', `var(${zone[2]})`);
   zoneGroup.position.set(info.center.x, info.floor + 0.01, info.center.z);
   cameraReadouts(pick); drawPlan(pick);
@@ -860,18 +1530,19 @@ function applyReads() {
 
 // ---------- camera readouts, focus & depth of field ----------
 const STOPS = [1.4, 2, 2.8, 4, 5.6, 8, 11, 16];
-const COC = Math.hypot(36, SENSOR_H) / 1443;     // circle of confusion, mm
-let fstop = 2.8, focusDist = 3, focusTarget = 3, autoFocus = true;
+let COC = Math.hypot(SENSOR_W, SENSOR_H) / 1443;     // circle of confusion, mm
+let fstop = 4, focusDist = 3, focusTarget = 3, autoFocus = true;
 const F_MIN = 0.3, F_MAX = 60;
 const focusToSlider = d => Math.round(1000 * Math.log(THREE.MathUtils.clamp(d, F_MIN, F_MAX) / F_MIN) / Math.log(F_MAX / F_MIN));
 const sliderToFocus = v => F_MIN * Math.pow(F_MAX / F_MIN, v / 1000);
 function setManualFocus(d) {
+  focusMode = 'manual'; rack = null; if ($('focusOn')) $('focusOn').value = 'manual';
   autoFocus = false; $('af').setAttribute('aria-pressed', 'false');
   focusTarget = focusDist = THREE.MathUtils.clamp(d, F_MIN, F_MAX); syncFocusUI();
 }
 function syncFocusUI() {
   if (document.activeElement !== $('focus')) $('focus').value = focusToSlider(focusDist);
-  $('focusv').textContent = focusDist >= F_MAX - 0.01 ? '∞' : focusDist < 10 ? focusDist.toFixed(2) + ' m' : focusDist.toFixed(1) + ' m';
+  $('focusv').textContent = focusDist >= F_MAX - 0.01 ? '∞' : fmtM(focusDist);
 }
 const stopBox = $('stops');
 STOPS.forEach(n => {
@@ -879,9 +1550,14 @@ STOPS.forEach(n => {
   b.onclick = () => { fstop = n; syncStops(); };
   stopBox.appendChild(b);
 });
-function syncStops() { [...stopBox.children].forEach((b, i) => b.setAttribute('aria-pressed', STOPS[i] === fstop)); }
+function syncStops() {
+  [...stopBox.children].forEach((b, i) => b.setAttribute('aria-pressed', STOPS[i] === fstop));
+  const i = THIRDS.reduce((bi, v, j) => Math.abs(v - fstop) < Math.abs(THIRDS[bi] - fstop) ? j : bi, 0);
+  if (document.activeElement !== $('apS')) $('apS').value = i;
+  $('apSv').textContent = 'f/' + fstop;
+  if (typeof syncGradeUI === 'function') syncGradeUI();      // aperture can change exposure
+}
 $('focus').oninput = e => setManualFocus(sliderToFocus(+e.target.value));
-$('af').onclick = () => { autoFocus = !autoFocus; $('af').setAttribute('aria-pressed', autoFocus); };
 function dofRange() {
   const f = rig.lens, s = focusDist * 1000, hyper = f * f / (fstop * COC) + f;
   const near = s * (hyper - f) / (hyper + s - 2 * f) / 1000;
@@ -895,10 +1571,10 @@ function measureFocus(pick) {
   const hit = centerRay.intersectObjects([setRoot, castRoot], true).find(h => h.object.isMesh && h.object.visible);
   return hit ? hit.distance : Infinity;
 }
-const fmtM = m => !isFinite(m) ? '∞' : m < 10 ? m.toFixed(2) + ' m' : m.toFixed(1) + ' m';
+function fmtM(m) { return !isFinite(m) ? '∞' : units === 'ft' ? (m * 3.28084 < 30 ? (m * 3.28084).toFixed(1) : Math.round(m * 3.28084)) + ' ft' : m < 10 ? m.toFixed(2) + ' m' : m.toFixed(1) + ' m'; }
 function cameraReadouts(pick) {
   const d = currentDir();
-  const hfov = THREE.MathUtils.radToDeg(2 * Math.atan(18 / rig.lens));
+  const hfov = THREE.MathUtils.radToDeg(2 * Math.atan(SENSOR_W / 2 / rig.lens));
   const floorY = pick ? pick.info.floor : bounds.min.y;
   const pan = ((THREE.MathUtils.radToDeg(-currentYaw()) % 360) + 360) % 360;
   set($('cLens'), `${rig.lens} mm`);
@@ -907,94 +1583,171 @@ function cameraReadouts(pick) {
   const tilt = THREE.MathUtils.radToDeg(Math.asin(THREE.MathUtils.clamp(d.y, -1, 1)));
   set($('cTilt'), `${tilt >= 0 ? '+' : ''}${tilt.toFixed(0)}° ${Math.abs(tilt) < 2 ? 'level' : tilt > 0 ? 'up' : 'down'}`);
   set($('cPan'), `${pan.toFixed(0)}°`);
-  if (autoFocus) { const m = measureFocus(pick); focusTarget = isFinite(m) ? THREE.MathUtils.clamp(m, F_MIN, F_MAX) : F_MAX; }
+  if (autoFocus) focusTarget = THREE.MathUtils.clamp(focusTargetFor(pick), F_MIN, F_MAX);
   set($('cFocus'), fmtM(focusDist) + (autoFocus ? ' AF' : ' MF'));
   $('cFocus').title = autoFocus ? (pick ? 'Auto focus on the subject\'s eyes' : 'Auto focus on the centre of frame') : 'Manual focus';
   set($('cStop'), `f/${fstop}`);
   const [near, far] = dofRange();
-  set($('cDof'), `${fmtM(near).replace(' m', '')}–${fmtM(far)}`);
+  set($('cDof'), `${fmtM(near).replace(/ (m|ft)$/, '')}–${fmtM(far)}`);
+  const vfov = THREE.MathUtils.radToDeg(2 * Math.atan(SENSOR_H / 2 / rig.lens)), crop = 43.27 / Math.hypot(SENSOR_W, SENSOR_H);
+  set($('lH'), `${hfov.toFixed(0)}° × ${vfov.toFixed(0)}°`); set($('lTot'), isFinite(far) ? fmtM(far - near) : '∞');
+  set($('lEq'), Math.abs(crop - 1) < 0.03 ? `${rig.lens} mm` : `${Math.round(rig.lens * crop)} mm (×${crop.toFixed(2)})`);
+  set($('lNear'), fmtM(near)); set($('lFar'), fmtM(far));
+  set($('lHyp'), fmtM((rig.lens * rig.lens / (fstop * COC) + rig.lens) / 1000));
 }
 
 // ---------- lens blur: scene -> texture + depth, then a physical circle-of-confusion blur ----------
 const dofRT = { rt: null, w: 0, h: 0 };
 const dofMat = new THREE.ShaderMaterial({
-  uniforms: { tColor: { value: null }, tDepth: { value: null }, uRes: { value: new THREE.Vector2() }, uNear: { value: 0.02 }, uFar: { value: 500 },
-              uFocus: { value: 3 }, uK: { value: 0 }, uMax: { value: 16 } },
+  uniforms: { tColor: { value: null }, tDepth: { value: null }, uRes: { value: new THREE.Vector2() }, uFrame: { value: new THREE.Vector2(1, 1) },
+              uNear: { value: 0.02 }, uFar: { value: 500 }, uFocus: { value: 3 }, uK: { value: 0 }, uMax: { value: 16 },
+              uWB: { value: new THREE.Vector3(1, 1, 1) }, uLift: { value: new THREE.Vector3() }, uGain: { value: new THREE.Vector3(1, 1, 1) },
+              uSat: { value: 1 }, uCon: { value: 1 }, uMono: { value: 0 }, uVig: { value: 0 }, uGrain: { value: 0 }, uTime: { value: 0 }, uFalse: { value: 0 }, uPeak: { value: 0 }, uBlur: { value: 1 }, uSamples: { value: 48 } },
   vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
   fragmentShader: `
-    uniform sampler2D tColor, tDepth; uniform vec2 uRes; uniform float uNear, uFar, uFocus, uK, uMax;
+    uniform sampler2D tColor, tDepth; uniform vec2 uRes, uFrame; uniform float uNear, uFar, uFocus, uK, uMax;
+    uniform vec3 uWB, uLift, uGain; uniform float uSat, uCon, uMono, uVig, uGrain, uTime, uFalse, uPeak, uBlur, uSamples;
     varying vec2 vUv;
     float dist(vec2 uv){ float d = texture2D(tDepth, uv).x; return (uNear * uFar) / (uFar - d * (uFar - uNear)); }
     float coc(float D){ return min(uMax, uK * abs(D - uFocus) / max(D, 0.001)); }   // blur radius in pixels
     void main(){
-      float c0 = coc(dist(vUv));
-      vec3 sum = texture2D(tColor, vUv).rgb; float wsum = 1.0;
-      if (c0 > 0.5) {
-        const int N = 48;
-        for (int i = 0; i < N; i++) {
-          float r = sqrt((float(i) + 0.5) / float(N)) * c0;
-          float a = float(i) * 2.39996323;
-          vec2 uv = vUv + vec2(cos(a), sin(a)) * r / uRes;
-          float cs = coc(dist(uv));
-          float w = clamp(cs - r + 1.0, 0.0, 1.0);       // a sample only spreads as far as its own blur
-          sum += texture2D(tColor, uv).rgb * w; wsum += w;
+      vec3 col = texture2D(tColor, vUv).rgb;
+      float c0 = uK > 0.0 ? coc(dist(vUv)) : 0.0;
+      if (uBlur > 0.5) {
+        if (c0 > 0.5) {
+          vec3 sum = col; float wsum = 1.0;
+          const int N = 48;
+          for (int i = 0; i < N; i++) {
+            if (float(i) >= uSamples) break;
+            float r = sqrt((float(i) + 0.5) / uSamples) * c0;
+            float a = float(i) * 2.39996323;
+            vec2 uv = vUv + vec2(cos(a), sin(a)) * r / uRes;
+            float w = clamp(coc(dist(uv)) - r + 1.0, 0.0, 1.0);   // a sample only spreads as far as its own blur
+            sum += texture2D(tColor, uv).rgb * w; wsum += w;
+          }
+          col = sum / wsum;
         }
       }
-      gl_FragColor = vec4(sum / wsum, 1.0);
+      // grade: white balance, look tint, saturation / mono, contrast
+      col = pow(pow(max(col, 0.0), vec3(2.2)) * uWB, vec3(1.0 / 2.2));   // white balance in linear light
+      col = col * uGain + uLift * (1.0 - col);
+      float l = dot(col, vec3(0.2126, 0.7152, 0.0722));
+      col = mix(vec3(l), col, uSat * (1.0 - uMono));
+      col = (col - 0.5) * uCon + 0.5;
+      vec2 p = (gl_FragCoord.xy - uRes * 0.5) / uFrame;
+      col *= 1.0 - uVig * smoothstep(0.45, 1.05, length(p) * 1.414);
+      float n = fract(sin(dot(gl_FragCoord.xy + uTime * 61.0, vec2(12.9898, 78.233))) * 43758.5453) - 0.5;
+      col += n * uGrain;
+      if (uPeak > 0.5 && c0 < 1.0) {        // focus peaking: strong edges inside the sharp zone
+        vec2 px = 1.0 / uRes;
+        float lx = dot(texture2D(tColor, vUv + vec2(px.x, 0.0)).rgb - texture2D(tColor, vUv - vec2(px.x, 0.0)).rgb, vec3(0.333));
+        float ly = dot(texture2D(tColor, vUv + vec2(0.0, px.y)).rgb - texture2D(tColor, vUv - vec2(0.0, px.y)).rgb, vec3(0.333));
+        if (length(vec2(lx, ly)) > 0.16) col = vec3(1.0, 0.15, 0.1);
+      }
+      if (uFalse > 0.5) {                   // false colour exposure bands
+        float y = dot(clamp(col, 0.0, 1.0), vec3(0.2126, 0.7152, 0.0722));
+        vec3 g = vec3(y * 0.8);
+        if (y < 0.03) g = vec3(0.55, 0.3, 0.85);
+        else if (y < 0.12) g = vec3(0.2, 0.4, 0.95);
+        else if (y > 0.42 && y < 0.5) g = vec3(0.25, 0.8, 0.35);
+        else if (y > 0.66 && y < 0.74) g = vec3(1.0, 0.55, 0.8);
+        else if (y > 0.92 && y < 0.98) g = vec3(1.0, 0.88, 0.25);
+        else if (y >= 0.98) g = vec3(1.0, 0.3, 0.25);
+        col = g;
+      }
+      gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
     }`,
   depthTest: false, depthWrite: false
 });
+const dummyDepth = new THREE.DataTexture(new Uint8Array([255, 255, 255, 255]), 1, 1); dummyDepth.needsUpdate = true;
+const colorRT = { rt: null, w: 0, h: 0 };
 const dofScene = new THREE.Scene(), dofCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 dofScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), dofMat));
 let blurOn = true, blurFailed = false;
 $('blur').onchange = e => { blurOn = e.target.checked; };
-function renderView() {
+function renderView(opts = {}) {
+  const capture = !!opts.forCapture;
+  if (viewMode === 'witness' && !capture) {
+    witness.visible = true; lampGroup.visible = true; renderer.setRenderTarget(null); renderer.render(scene, wcam); witness.visible = false; return;
+  }
+  witness.visible = false; lampGroup.visible = $('showLamps').checked;
   const dpr = renderer.getPixelRatio();
   const kmm = rig.lens * rig.lens / (fstop * Math.max(1, focusDist * 1000 - rig.lens));   // f²/(N(S−f)), mm on the sensor
   const pxPerMm = fh * dpr / SENSOR_H;
   const k = kmm * pxPerMm;                                   // blur radius in px = k·|D−S|/D
-  if (!blurOn || blurFailed || k < 0.4) { renderer.setRenderTarget(null); renderer.render(scene, cam); return; }
+  const blurNeeded = blurOn && !blurFailed && k >= 0.4;
+  const falseCol = grade.monitor === 'false' && !capture, peak = grade.peak && !capture;   // monitor tools never go into captures
+  const wantBlur = !blurFailed && (blurNeeded || peak);                                    // both need the depth pass
+  if (!wantBlur && gradeNeutral() && !falseCol) { renderer.setRenderTarget(null); renderer.render(scene, cam); return; }
   const w = Math.round(W * dpr), h = Math.round(H * dpr);
   try {
-    if (!dofRT.rt || dofRT.w !== w || dofRT.h !== h) {
-      if (dofRT.rt) dofRT.rt.dispose();
-      const rt = new THREE.WebGLRenderTarget(w, h, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter });
-      rt.texture.encoding = THREE.sRGBEncoding;
-      rt.depthTexture = new THREE.DepthTexture(w, h); rt.depthTexture.type = THREE.UnsignedIntType;
-      Object.assign(dofRT, { rt, w, h });
+    let rt;
+    if (wantBlur) {
+      if (!dofRT.rt || dofRT.w !== w || dofRT.h !== h) {
+        if (dofRT.rt) dofRT.rt.dispose();
+        const r = new THREE.WebGLRenderTarget(w, h, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter });
+        r.texture.encoding = THREE.sRGBEncoding;
+        r.depthTexture = new THREE.DepthTexture(w, h); r.depthTexture.type = THREE.UnsignedIntType;
+        Object.assign(dofRT, { rt: r, w, h });
+      }
+      rt = dofRT.rt;
+    } else {
+      if (!colorRT.rt || colorRT.w !== w || colorRT.h !== h) {
+        if (colorRT.rt) colorRT.rt.dispose();
+        const r = renderer.capabilities.isWebGL2 && THREE.WebGLMultisampleRenderTarget
+          ? new THREE.WebGLMultisampleRenderTarget(w, h, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter })   // keeps edges smooth
+          : new THREE.WebGLRenderTarget(w, h, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter });
+        if (r.samples !== undefined) r.samples = 4;
+        r.texture.encoding = THREE.sRGBEncoding;
+        Object.assign(colorRT, { rt: r, w, h });
+      }
+      rt = colorRT.rt;
     }
-    renderer.setRenderTarget(dofRT.rt); renderer.render(scene, cam); renderer.setRenderTarget(null);
+    renderer.setRenderTarget(rt); renderer.render(scene, cam); renderer.setRenderTarget(null);
     const u = dofMat.uniforms;
-    u.tColor.value = dofRT.rt.texture; u.tDepth.value = dofRT.rt.depthTexture; u.uRes.value.set(w, h);
+    u.tColor.value = rt.texture; u.tDepth.value = wantBlur ? rt.depthTexture : dummyDepth; u.uRes.value.set(w, h); u.uFrame.value.set(fw * dpr, fh * dpr);
     u.uNear.value = cam.near; u.uFar.value = cam.far; u.uFocus.value = focusDist;
-    u.uK.value = k; u.uMax.value = 18 * dpr;
+    u.uK.value = wantBlur ? k : 0; u.uMax.value = 18 * dpr;
+    u.uWB.value.fromArray(wbGain()); u.uLift.value.fromArray(grade.lift); u.uGain.value.fromArray(grade.gain);
+    u.uSat.value = grade.sat; u.uCon.value = grade.con; u.uMono.value = grade.mono; u.uVig.value = grade.vig;
+    u.uGrain.value = grade.grain; u.uTime.value = (performance.now() / 1000) % 100; u.uFalse.value = falseCol ? 1 : 0; u.uPeak.value = peak ? 1 : 0;
+    u.uBlur.value = blurNeeded ? 1 : 0; u.uSamples.value = grade.perf === 'low' ? 16 : grade.perf === 'high' ? 48 : 32;
     renderer.render(dofScene, dofCam);
-  } catch (e) { blurFailed = true; renderer.setRenderTarget(null); renderer.render(scene, cam); note("This device can't draw lens blur, so the picture stays sharp.", 5000); }
+  } catch (e) { blurFailed = true; renderer.setRenderTarget(null); renderer.render(scene, cam); note("This device can't draw lens blur or the image look, so the picture stays plain.", 5000); }
 }
 
-// ---------- shot sizes (place camera like a framing preset) ----------
-const SIZES = [['ECU', 'Eyes', .08, .065], ['CU', 'Face', .19, .08], ['MCU', 'Chest up', .32, .13], ['MS', 'Waist up', .50, .21],
-               ['MWS', 'Cowboy', .68, .29], ['FS', 'Head to toe', 1.2, .50], ['WS', 'In the space', 2.2, .55], ['EWS', 'Tiny', 5.0, .60]];
-const HEIGHTS = [["Worm's", -60], ['Low', -20], ['Eye', 0], ['High', 25], ["Bird's", 70]];
-let lastSize = null, elev = 0;
-const sizeBox = $('sizes'), heightBox = $('heights');
+// ---------- shot sizes and angles (place camera like a framing preset) ----------
+const SIZES = [['ECU', 'Extreme close', .08, .065], ['CU', 'Close-up', .19, .08], ['MCU', 'Med. close', .32, .13], ['MS', 'Medium', .50, .21],
+               ['MLS', 'Med. long', .75, .32], ['LS', 'Long', 1.2, .50], ['WS', 'Wide', 2.2, .55], ['EWS', 'Extreme wide', 5.0, .60]];
+const ANGLES = [['BEV', "Bird's-eye", 75, 0], ['High', 'High angle', 25, 0], ['Level', 'Eye level', 0, 0], ['Low', 'Low angle', -20, 0],
+                ['WEV', "Worm's-eye", -60, 0], ['Cant L', 'Canted left', null, -15], ['Cant R', 'Canted right', null, 15]];
+let lastSize = null, elev = 0, lastAngle = 'Level';
+const sizeBox = $('sizes'), angleBox = $('angles');
 SIZES.forEach(sz => {
   const b = document.createElement('button'); b.className = 'size';
   const bb = document.createElement('b'); bb.textContent = sz[0];
   const sm = document.createElement('small'); sm.textContent = sz[1];
   b.append(bb, sm); b.onclick = () => frameShot(sz[0]); sizeBox.appendChild(b);
 });
-HEIGHTS.forEach(([lab, deg]) => {
-  const b = document.createElement('button'); b.className = 'chip'; b.textContent = lab;
-  b.onclick = () => { elev = deg; syncPresets(); if (lastSize) frameShot(lastSize); };
-  heightBox.appendChild(b);
+ANGLES.forEach(([lab, sub, deg, cant]) => {
+  const b = document.createElement('button'); b.className = 'size';
+  const bb = document.createElement('b'); bb.textContent = lab;
+  const sm = document.createElement('small'); sm.textContent = sub;
+  b.append(bb, sm);
+  b.onclick = () => {
+    lastAngle = lab;
+    if (deg === null) setDutch(THREE.MathUtils.degToRad(cant));
+    else { elev = deg; setDutch(0); if (lastSize) frameShot(lastSize); else { const s = framedSubject(); if (s) frameShot('MS'); } }
+    syncPresets();
+  };
+  angleBox.appendChild(b);
 });
 function syncPresets() {
   [...sizeBox.children].forEach((b, i) => b.setAttribute('aria-pressed', SIZES[i][0] === lastSize));
-  [...heightBox.children].forEach((b, i) => b.setAttribute('aria-pressed', HEIGHTS[i][1] === elev));
+  [...angleBox.children].forEach((b, i) => b.setAttribute('aria-pressed', ANGLES[i][0] === lastAngle));
 }
 function frameShot(id) {
-  const s = current || nearestSubject();
+  const s = framedSubject();
   if (!s) { note('Add a subject first (Subjects tab), so the camera knows who to frame.', 4000); return; }
   const sz = SIZES.find(z => z[0] === id), info = subjectInfo(s), h = info.h;
   const frameH = sz[2] * h, dist = frameH * rig.lens / SENSOR_H;
@@ -1019,7 +1772,7 @@ stick.addEventListener('pointerdown', clearPreset);
 hIn.addEventListener('input', clearPreset);
 
 // ---------- tabs ----------
-const TABS = ['frame', 'plan', 'subj', 'set'];
+const TABS = ['camera', 'lens', 'light', 'image', 'plan', 'subj', 'set'];
 TABS.forEach(t => $('t-' + t).onclick = () => {
   TABS.forEach(u => { $('t-' + u).setAttribute('aria-selected', u === t); $('p-' + u).hidden = u !== t; });
   if (t === 'plan') sizePlan();
@@ -1068,7 +1821,7 @@ function drawPlan(pick) {
     ZONES.forEach(z => { c.strokeStyle = '#' + z[3].toString(16).padStart(6, '0') + 'aa'; c.lineWidth = 1.5 * k; c.beginPath(); c.arc(PX(ci.x), PZ(ci.z), z[0] * sc, 0, Math.PI * 2); c.stroke(); });
   }
   // camera field of view
-  const yaw = currentYaw(), half = Math.atan(18 / rig.lens), reach = Math.min(Math.max(focusDist * 1.25, 3), 30);
+  const yaw = currentYaw(), half = Math.atan(SENSOR_W / 2 / rig.lens), reach = Math.min(Math.max(focusDist * 1.25, 3), 30);
   const fx = a => rig.x - Math.sin(a) * reach, fz = a => rig.z - Math.cos(a) * reach;
   c.fillStyle = 'rgba(242,177,52,.16)'; c.strokeStyle = 'rgba(242,177,52,.85)'; c.lineWidth = 1.5 * k;
   c.beginPath(); c.moveTo(PX(rig.x), PZ(rig.z)); c.lineTo(PX(fx(yaw + half)), PZ(fz(yaw + half))); c.lineTo(PX(fx(yaw - half)), PZ(fz(yaw - half))); c.closePath(); c.fill(); c.stroke();
@@ -1090,6 +1843,15 @@ function drawPlan(pick) {
     c.strokeStyle = c.fillStyle; c.lineWidth = 2 * k; c.beginPath(); c.moveTo(x, z); c.lineTo(x + i.fwd.x * r * 2.2, z + i.fwd.z * r * 2.2); c.stroke();
     c.fillText(s.name, x + r + 4 * k, z - r);
   });
+  // lamps: K / F / B, with a line to where they aim
+  LIGHT_DEFS.forEach(([id, , letter]) => {
+    const L = rigLights[id]; if (!L.p.on) return;
+    const t = aimPoint(L.p.aim), x = PX(L.p.x), z = PZ(L.p.z), col = '#' + gelled(L.p).color.getHexString();
+    c.strokeStyle = col + '99'; c.lineWidth = 1.5 * k; c.setLineDash([3 * k, 3 * k]); c.beginPath(); c.moveTo(x, z); c.lineTo(PX(t.x), PZ(t.z)); c.stroke(); c.setLineDash([]);
+    c.fillStyle = '#16171a'; c.strokeStyle = col; c.lineWidth = 2 * k; c.beginPath(); c.arc(x, z, 9 * k, 0, Math.PI * 2); c.fill(); c.stroke();
+    c.fillStyle = col; c.font = `bold ${10 * k}px "Archivo Narrow", sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(letter, x, z + 0.5 * k);
+    c.textAlign = 'start'; c.textBaseline = 'alphabetic';
+  });
   // camera body
   c.fillStyle = '#f2b134'; c.beginPath(); c.arc(PX(rig.x), PZ(rig.z), 5 * k, 0, Math.PI * 2); c.fill();
   c.fillStyle = 'rgba(255,255,255,.55)'; c.fillText('BACK OF SET', 6 * k, 14 * k);
@@ -1105,10 +1867,17 @@ function nearFocusLine(px, pz) {
   const t = THREE.MathUtils.clamp(((px - x1) * dx + (pz - z1) * dz) / (dx * dx + dz * dz || 1), 0, 1);
   return Math.hypot(px - (x1 + t * dx), pz - (z1 + t * dz)) < 16 * planView.dpr;
 }
+function lampAt(px, pz) {
+  for (const [id] of LIGHT_DEFS) { const p = rigLights[id].p; if (p.on && Math.hypot(PX(p.x) - px, PZ(p.z) - pz) < 14 * planView.dpr) return id; }
+  return null;
+}
 function planMove(e) {
   if (!planView) return;
   const [px, pz] = planPoint(e);
   const wx = (px - planView.ox) / planView.sc, wz = (pz - planView.oz) / planView.sc;
+  if (planDrag && planDrag.startsWith('lamp:')) {
+    const p = rigLights[planDrag.slice(5)].p; p.x = wx; p.z = wz; positionLights(); markPresetCustom(); return;
+  }
   if (planDrag === 'focus') {
     const yaw = currentYaw();
     setManualFocus((wx - rig.x) * -Math.sin(yaw) + (wz - rig.z) * -Math.cos(yaw));
@@ -1121,12 +1890,13 @@ function planMove(e) {
 plan.addEventListener('pointerdown', e => {
   if (!planView) return;
   const [px, pz] = planPoint(e);
-  planDrag = nearFocusLine(px, pz) ? 'focus' : 'cam';
+  const lamp = lampAt(px, pz);
+  planDrag = lamp ? 'lamp:' + lamp : nearFocusLine(px, pz) ? 'focus' : 'cam';
   plan.setPointerCapture(e.pointerId); planMove(e);
 });
 plan.addEventListener('pointermove', e => {
   if (planDrag) planMove(e);
-  else if (planView) { const [px, pz] = planPoint(e); plan.style.cursor = nearFocusLine(px, pz) ? 'ew-resize' : 'crosshair'; }
+  else if (planView) { const [px, pz] = planPoint(e); plan.style.cursor = lampAt(px, pz) ? 'move' : nearFocusLine(px, pz) ? 'ew-resize' : 'crosshair'; }
 });
 plan.addEventListener('pointerup', () => { planDrag = false; });
 plan.addEventListener('pointercancel', () => { planDrag = false; });
@@ -1304,7 +2074,7 @@ $('mqMove').onclick = () => { if (castSel) { pendingChar = null; startPlacing(ca
 function placeAt(cx, cy) {
   placing = false; stage.classList.remove('picking');
   const r = stage.getBoundingClientRect();
-  ray.setFromCamera({ x: (cx - r.left) / r.width * 2 - 1, y: -((cy - r.top) / r.height) * 2 + 1 }, cam);
+  ray.setFromCamera({ x: (cx - r.left) / r.width * 2 - 1, y: -((cy - r.top) / r.height) * 2 + 1 }, activeCam());
   let p = null;
   const hits = ray.intersectObject(setRoot, true).filter(h => h.object.isMesh && h.object.visible && h.face);
   for (const h of hits) {
@@ -1485,7 +2255,7 @@ $('pmApply').onclick = () => {
   else pmMsg("Couldn't see the shoulders and hips clearly. Try another photo.");
 };
 renderCast();
-window.VF = { registerCharacter, addCharacter, standPose, renderView, get focus() { return focusDist; }, setManualFocus, set fstop(v) { fstop = v; syncStops(); }, addMannequin, applyLandmarks, getPose, setPose, castState, get cast() { return cast; }, rig, cam, frameShot, subjectInfo, get subjects() { return subjects; } };
+window.VF = { applyLightPreset, applyLook, setView, setFormat, grade, rigLights, registerCharacter, addCharacter, standPose, renderView, get focus() { return focusDist; }, setManualFocus, set fstop(v) { fstop = v; syncStops(); }, addMannequin, applyLandmarks, getPose, setPose, castState, get cast() { return cast; }, rig, cam, frameShot, subjectInfo, get subjects() { return subjects; } };
 
 // ---------- capture (frames live in memory until saved) ----------
 let shots = [], dirty = false, setGlb = null, setLabel = 'Sample diner';
@@ -1534,10 +2304,10 @@ function deleteShot(i) {
   if (!$('bv').hidden) { loupeIdx = Math.min(loupeIdx, shots.length - 1); renderBoard(); }
 }
 $('capture').onclick = () => {
-  renderView();
-  const c = document.createElement('canvas'); c.width = 640; c.height = 360;
+  renderView({ forCapture: true });
+  const c = document.createElement('canvas'); c.width = 640; c.height = Math.round(640 / ASPECT);
   const dpr = renderer.getPixelRatio();
-  c.getContext('2d').drawImage(canvas, (W - fw) / 2 * dpr, (H - fh) / 2 * dpr, fw * dpr, fh * dpr, 0, 0, 640, 360);
+  c.getContext('2d').drawImage(canvas, (W - fw) / 2 * dpr, (H - fh) / 2 * dpr, fw * dpr, fh * dpr, 0, 0, c.width, c.height);
   const d = currentDir();
   shots.push({ url: c.toDataURL('image/jpeg', 0.82), title: '', label: lastShot, note: '', cast: cast.map(castState), x: rig.x, y: rig.y, z: rig.z, lens: rig.lens, fstop,
                yaw: Math.atan2(-d.x, -d.z), pitch: Math.asin(THREE.MathUtils.clamp(d.y, -1, 1)) });
@@ -1583,7 +2353,10 @@ $('save').onclick = async () => {
   const project = {
     app: 'set-viewfinder', version: 1, savedAt: new Date().toISOString(),
     set: { name: setLabel, glb: setGlb ? bufToB64(setGlb) : null },
-    camera: { x: rig.x, y: rig.y, z: rig.z, lens: rig.lens, fstop, yaw: currentYaw(), pitch: Math.asin(THREE.MathUtils.clamp(currentDir().y, -1, 1)) },
+    camera: { x: rig.x, y: rig.y, z: rig.z, lens: rig.lens, fstop, yaw: currentYaw(), pitch: Math.asin(THREE.MathUtils.clamp(currentDir().y, -1, 1)), roll: rig.roll, sensor: SENSOR_W, aspect: ASPECT },
+    image: { ...grade },
+    lighting: { preset: lightPreset, env: { ...env }, lights: Object.fromEntries(Object.entries(rigLights).map(([id, L]) => [id, { ...L.p }])) },
+    move: { start: move.start, end: move.end, len: move.len },
     subjects: subjects.filter(s => !s.mq).map(s => ({ name: s.name, node: s.obj.name })),
     cast: cast.map(c => ({ ...castState(c), name: c.name, color: c.color, charId: c.charId })),
     characters: Object.fromEntries(Object.entries(chars).filter(([id]) => cast.some(c => c.charId === id)).map(([id, c]) => [id, { name: c.name, glb: bufToB64(c.buf) }])),
@@ -1624,10 +2397,21 @@ function openProject(file) {
         }
         renderCast(); markDirty(false);
       })();
+      if (p.image) { Object.assign(grade, p.image); syncGradeUI(); }
+      if (p.lighting) {
+        const Lg = p.lighting;
+        for (const id in rigLights) if (Lg.lights && Lg.lights[id] && 'x' in Lg.lights[id]) Object.assign(rigLights[id].p, Lg.lights[id]);
+        if (Lg.env) Object.assign(env, Lg.env);
+        lightPreset = Lg.preset || 'custom'; [...$('lpresets').children].forEach(b => b.setAttribute('aria-pressed', b.dataset.p === lightPreset));
+        applyEnv(); positionLights(); renderLightCards(true);
+      }
+      if (p.move) { Object.assign(move, p.move, { playing: false }); $('mvLen').value = move.len; $('mvLenv').textContent = move.len.toFixed(1) + ' s'; moveStatus(); }
       const c = p.camera;
       if (c) {
         Object.assign(rig, { x: c.x, y: c.y, z: c.z, lens: c.lens || rig.lens });
         if (c.fstop) fstop = c.fstop;
+        rig.roll = c.roll || 0; $('dutch').value = Math.round(THREE.MathUtils.radToDeg(rig.roll)); $('dutchv').textContent = $('dutch').value + '°';
+        if (c.sensor && c.aspect) setFormat(c.sensor, c.aspect);
         hIn.value = rig.y; syncLens(); syncStops(); setLook(c.yaw || 0, c.pitch || 0);
       }
       shots = Array.isArray(p.shots) ? p.shots.filter(s => s && typeof s.url === 'string' && s.url.startsWith('data:image/')) : [];
@@ -1793,18 +2577,20 @@ addEventListener('keydown', e => {
 
 // ---------- loop ----------
 let last = performance.now(), tick = 0;
-const yq = new THREE.Quaternion(), yAxis = new THREE.Vector3(0, 1, 0), lookE = new THREE.Euler(0, 0, 0, 'YXZ');
+const yq = new THREE.Quaternion(), yAxis = new THREE.Vector3(0, 1, 0), lookE = new THREE.Euler(0, 0, 0, 'YXZ'), rollQ = new THREE.Quaternion(), zAxis = new THREE.Vector3(0, 0, 1);
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   if (gyro) {
     const rate = 3 + 40 * Math.pow(1 - smoothing, 2);          // higher smoothing = slower, calmer follow
     smoothQ.slerp(devQ, 1 - Math.exp(-rate * dt));
-    cam.quaternion.copy(yq.setFromAxisAngle(yAxis, yawOffset)).multiply(smoothQ);
+    cam.quaternion.copy(yq.setFromAxisAngle(yAxis, yawOffset)).multiply(smoothQ).multiply(rollQ.setFromAxisAngle(zAxis, rig.roll));
   }
-  else cam.quaternion.setFromEuler(lookE.set(rig.pitch, rig.yaw, 0));
+  else cam.quaternion.setFromEuler(lookE.set(rig.pitch, rig.yaw, rig.roll));
+  stepMove(now);
+  applyHeldMoves(dt);
   let mx = joy.x, my = joy.y;
-  if (keys.w || keys.arrowup) my -= 1; if (keys.s || keys.arrowdown) my += 1;
-  if (keys.a || keys.arrowleft) mx -= 1; if (keys.d || keys.arrowright) mx += 1;
+  if (keys.w) my -= 1; if (keys.s) my += 1;
+  if (keys.a) mx -= 1; if (keys.d) mx += 1;
   if (keys.q) { rig.y = Math.max(+hIn.min, rig.y - dt); hIn.value = rig.y; }
   if (keys.e) { rig.y = Math.min(+hIn.max, rig.y + dt); hIn.value = rig.y; }
   if (mx || my) {
@@ -1815,15 +2601,16 @@ function frame(now) {
     rig.z = THREE.MathUtils.clamp(rig.z, bounds.min.z - 3, bounds.max.z + 3);
   }
   cam.position.set(rig.x, rig.y, rig.z);
-  $('hv').textContent = (rig.y - bounds.min.y).toFixed(2) + ' m';
-  if (tick++ % 6 === 0) readouts();
-  if (autoFocus) focusDist += (focusTarget - focusDist) * (1 - Math.exp(-dt * 6));   // smooth rack focus
+  $('hv').textContent = fmtM(rig.y - bounds.min.y);
+  if (tick++ % 6 === 0) { readouts(); syncPositionUI(); }
+  updateWitness();
+  stepFocus(now, dt);
   syncFocusUI();
   renderView();
   requestAnimationFrame(frame);
 }
 
-applyWork(); syncLens(); syncStops(); syncPresets();
+syncLens(); syncStops(); syncPresets(); setFormat(SENSOR_W, ASPECT); renderSubjSeg(); renderFocusOptions();
 useSet(buildSample(), 'Sample diner', null);
 rig.x = 1.9; rig.z = 2.2; rig.y = 1.6; syncHeight(); faceSubject();
 layout();
